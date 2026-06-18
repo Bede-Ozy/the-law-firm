@@ -24,7 +24,7 @@ const EXHIBIT_DATA = {
     title: "Exhibit C — Title Reconstruction",
     correctAnswers: ["THE SON OF THE HOUSE"],
     openingMsg: "The Court now examines the structure of the title. Counsel is to reconstruct the full title from the evidence provided.",
-    hintMsg: "Titles, like testimony, often reveal their meaning through structure. Six words. Starts with 'THE', ends with 'HOUSE'.",
+    hintMsg: "Titles, like testimony, often reveal their meaning through structure. Five words. Starts with 'THE', ends with 'HOUSE'.",
     successMsg: "The literary title has been conclusively identified. Entry recorded: THE SON OF THE HOUSE.",
   },
   D: {

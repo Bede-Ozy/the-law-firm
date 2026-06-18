@@ -462,7 +462,7 @@ export const GamePage = () => {
                       <span className="px-2 py-1 bg-court-panel/20 border border-dashed border-court-border/15 rounded text-gray-500">[_ _ _ _ _]</span>
                     </div>
                     <div className="w-full text-xs font-serif italic text-gray-300 space-y-1.5 max-w-md border-t border-court-border/10 pt-3">
-                      <div>• Total Title Structure: Six words.</div>
+                      <div>• Total Title Structure: Five words.</div>
                       <div>• Bounds: Starts with 'THE', finishes with 'HOUSE'.</div>
                       <div>• Thematic note: The central subject is neither a king nor a father.</div>
                     </div>
