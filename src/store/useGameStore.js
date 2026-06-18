@@ -46,7 +46,7 @@ const EXHIBIT_DATA = {
   F: {
     id: "F",
     title: "Exhibit F — Custodian Identification",
-    correctAnswers: ["JAYKEN"],
+    correctAnswers: ["JEKEN"],
     openingMsg: "The Court now addresses custody of the evidence. Counsel must determine who holds the artifact.",
     hintMsg: "Custody is not ownership. Custody is responsibility. The custodian is younger than the defendant and lives in the same household.",
     successMsg: "Custodial authority confirmed. Retrieval is hereby authorized.",

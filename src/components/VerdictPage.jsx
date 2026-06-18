@@ -30,7 +30,7 @@ export const VerdictPage = () => {
     { text: "The origin of transmission has been established.", delay: 800 },
     { text: "BEDE", isHighlight: true, sound: "success", delay: 1200 },
     { text: "The Court hereby authorizes immediate retrieval of Exhibit A.", delay: 800 },
-    { text: "Custody lies with Officer Jayken.", delay: 1200 },
+    { text: "Custody lies with Officer Jeken.", delay: 1200 },
     
     // Conditional Easter Egg Line
     ...(isPerfectRun ? [
@@ -346,7 +346,7 @@ export const VerdictPage = () => {
                       SEAL
                     </div>
                     <div className="text-right">
-                      <div>JAYKEN COURT</div>
+                      <div>JEKEN COURT</div>
                       <div className="border-t border-gray-600/40 mt-1 pt-1">Court Archivist</div>
                     </div>
                   </div>

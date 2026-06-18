@@ -736,7 +736,7 @@ export const GamePage = () => {
                     <div>• “The custodian is younger than the accused.”</div>
                   </div>
                   <p className="font-sans text-xs text-gray-400">
-                    Input the custodian's name (6 letters).
+                    Input the custodian's name (5 letters).
                   </p>
                 </div>
               )}
