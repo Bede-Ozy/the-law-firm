@@ -44,6 +44,9 @@ export const GamePage = () => {
   const [objectionCount, setObjectionCount] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
+  const [exhibitDStage, setExhibitDStage] = useState(1);
+  const [selectedFindings, setSelectedFindings] = useState([]);
+  const [selectedConclusion, setSelectedConclusion] = useState("");
 
   const lawyerAvatar = playerGender === "FEMALE" ? lawyerFemale : lawyerMale;
 
@@ -113,6 +116,13 @@ export const GamePage = () => {
       return () => clearTimeout(timer);
     }
   }, [caseStatus, navigate]);
+
+  // Reset Exhibit D interactive state when tab switches
+  useEffect(() => {
+    setExhibitDStage(1);
+    setSelectedFindings([]);
+    setSelectedConclusion("");
+  }, [currentExhibitId]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -474,27 +484,226 @@ export const GamePage = () => {
               )}
 
               {currentExhibitId === "D" && (
-                <div className="space-y-4">
-                  <p className="font-sans text-sm text-gray-300 leading-relaxed">
-                    Review the transcript extract from the interrogation record of the prime suspect:
-                  </p>
-                  <div className="p-4 bg-court-bg/50 border border-court-border/10 rounded font-mono text-xs text-gray-300 space-y-3 max-h-[160px] overflow-y-auto">
-                    <div>
-                      <span className="text-court-gold font-bold">COUNSEL:</span> Did you handle the book artifact at the secondary campus site?
+                <div className="space-y-5 flex-grow flex flex-col justify-between">
+                  {completedExhibits.includes("D") ? (
+                    // Solved State UI
+                    <div className="space-y-4">
+                      <div className="p-4 bg-court-bg/50 border border-court-border/10 rounded font-mono text-xs text-gray-300 space-y-3 max-h-[140px] overflow-y-auto">
+                        <div>
+                          <span className="text-court-gold font-bold">COUNSEL:</span> Did you handle the book artifact at the secondary campus site?
+                        </div>
+                        <div>
+                          <span className="text-court-cyan font-bold">ACCUSED:</span> Absolutely not. I only read self-development logs. I struggle to recall basic plot structures of fantasy books, like Harry Potter. I have never accessed any literary fiction under docket custody.
+                        </div>
+                        <div className="text-gray-500 italic border-t border-court-border/10 pt-2">
+                          Verification Report: Accused's digital history indicates heavy logs on corporate development articles and zero hits on legal fantasy files.
+                        </div>
+                      </div>
+
+                      <div className="p-5 border border-emerald-500/20 bg-emerald-950/10 rounded-lg space-y-3">
+                        <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-bold">
+                          Admitted Findings & Conclusion
+                        </div>
+                        <div className="text-xs text-gray-300 space-y-1">
+                          <div>• The accused demonstrates familiarity with self-development literature.</div>
+                          <div>• The accused struggles to recall fantasy narratives.</div>
+                          <div>• Independent records support the accused's stated reading habits.</div>
+                          <div>• No verified connection exists between the accused and the literary artifact.</div>
+                        </div>
+                        <div className="border-t border-court-border/10 pt-2 flex justify-between items-center text-xs font-mono">
+                          <span className="text-gray-400">LEGAL CONCLUSION:</span>
+                          <span className="text-emerald-400 font-bold uppercase">NOT GUILTY</span>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-court-cyan font-bold">ACCUSED:</span> Absolutely not. I only read self-development logs. I struggle to recall basic plot structures of fantasy books, like Harry Potter. I have never accessed any literary fiction under docket custody.
+                  ) : (
+                    // Interactive Argument Flow UI
+                    <div className="space-y-4 flex-grow flex flex-col justify-between">
+                      {exhibitDStage === 1 ? (
+                        /* Stage 1: Findings Checkboxes */
+                        <div className="space-y-4 flex-grow flex flex-col justify-between">
+                          <div className="space-y-3">
+                            <p className="font-sans text-xs text-gray-400 italic leading-relaxed border-l-2 border-court-gold/50 pl-3 py-0.5">
+                              Review the interrogation record below, then select all findings supported by the evidence.
+                            </p>
+                            
+                            {/* Interrogation Box */}
+                            <div className="p-3.5 bg-court-bg/50 border border-court-border/10 rounded font-mono text-[11px] text-gray-300 space-y-2.5 max-h-[115px] overflow-y-auto">
+                              <div>
+                                <span className="text-court-gold font-bold">COUNSEL:</span> Did you handle the book artifact at the secondary campus site?
+                              </div>
+                              <div>
+                                <span className="text-court-cyan font-bold">ACCUSED:</span> Absolutely not. I only read self-development logs. I struggle to recall basic plot structures of fantasy books, like Harry Potter. I have never accessed any literary fiction under docket custody.
+                              </div>
+                              <div className="text-gray-500 italic border-t border-court-border/10 pt-1.5">
+                                Verification Report: Accused's digital history indicates heavy logs on corporate development articles and zero hits on legal fantasy files.
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Checkbox Findings List */}
+                          <div className="space-y-2 flex-grow">
+                            <div className="text-[10px] font-mono text-court-gold uppercase tracking-wider">Findings Docket</div>
+                            <div className="grid grid-cols-1 gap-2 max-h-[220px] overflow-y-auto pr-1">
+                              {[
+                                { key: "A", text: "The accused demonstrates familiarity with self-development literature." },
+                                { key: "B", text: "The accused possesses extensive expertise in fantasy fiction." },
+                                { key: "C", text: "The accused struggles to recall fantasy narratives." },
+                                { key: "D", text: "Independent records support the accused's stated reading habits." },
+                                { key: "E", text: "Evidence confirms the accused accessed the anonymous transmission." },
+                                { key: "F", text: "No verified connection exists between the accused and the literary artifact." }
+                              ].map((item) => {
+                                const isSelected = selectedFindings.includes(item.key);
+                                return (
+                                  <label
+                                    key={item.key}
+                                    className={`flex items-start gap-3 p-2.5 border rounded cursor-pointer transition-all ${
+                                      isSelected
+                                        ? "border-court-gold bg-court-blue/10 text-white"
+                                        : "border-court-border/15 text-gray-300 hover:border-court-gold/30 hover:bg-court-blue/5"
+                                    }`}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={() => {
+                                        if (isSelected) {
+                                          setSelectedFindings(prev => prev.filter(k => k !== item.key));
+                                        } else {
+                                          setSelectedFindings(prev => [...prev, item.key]);
+                                        }
+                                      }}
+                                      className="mt-1 accent-court-gold shrink-0 cursor-pointer"
+                                    />
+                                    <span className="text-[11px] leading-tight font-sans">
+                                      <strong className="font-mono text-court-gold mr-1.5">{item.key}.</strong>
+                                      {item.text}
+                                    </span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Submit findings button */}
+                          <div className="pt-3 border-t border-court-border/10 flex justify-end">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                // Correct findings: A, C, D, F
+                                const correct = ["A", "C", "D", "F"];
+                                const hasAllCorrect = selectedFindings.length === correct.length &&
+                                  selectedFindings.every(k => correct.includes(k));
+                                
+                                if (hasAllCorrect) {
+                                  soundManager.playSuccess();
+                                  setExhibitDStage(2);
+                                } else {
+                                  // Trigger error state in the store
+                                  const res = submitAnswer("D", "INVALID_FINDINGS");
+                                  if (!res.success) {
+                                    setShowStatusModal("ERROR");
+                                    setObjectionCount((prev) => prev + 1);
+                                    setTimeout(() => setShowStatusModal(null), 3000);
+                                  }
+                                }
+                              }}
+                              className="px-6 py-2.5 bg-court-panel border border-court-gold text-court-gold hover:bg-court-gold hover:text-court-bg rounded font-serif font-bold text-xs tracking-wider uppercase transition-all flex items-center gap-2"
+                            >
+                              <Scale size={14} />
+                              <span>Submit Findings</span>
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        /* Stage 2: Legal Conclusion Options */
+                        <div className="space-y-5 flex-grow flex flex-col justify-between py-2">
+                          <div className="space-y-4">
+                            <div className="p-4 bg-emerald-950/10 border border-emerald-500/20 text-emerald-300 rounded font-mono text-[11px] leading-relaxed">
+                              <strong>PROVISIONAL ADMITTANCE:</strong> The selected findings have been provisionally admitted into record. Counsel may now address the Court.
+                            </div>
+
+                            <div className="space-y-2">
+                              <span className="text-[10px] font-mono text-court-gold uppercase tracking-wider">Legal Question</span>
+                              <div className="text-xs text-gray-200 font-sans font-semibold">
+                                Based upon the admitted findings, what is the appropriate conclusion?
+                              </div>
+                            </div>
+
+                            {/* Radio Options Grid */}
+                            <div className="grid grid-cols-2 gap-3 pt-2">
+                              {[
+                                { key: "GUILTY", text: "Guilty" },
+                                { key: "NOT GUILTY", text: "Not Guilty" }
+                              ].map((option) => {
+                                const isSelected = selectedConclusion === option.key;
+                                return (
+                                  <button
+                                    key={option.key}
+                                    type="button"
+                                    onClick={() => setSelectedConclusion(option.key)}
+                                    className={`p-4 border rounded font-serif text-sm tracking-wider uppercase transition-all text-center flex flex-col items-center justify-center gap-2 cursor-pointer ${
+                                      isSelected
+                                        ? "border-court-gold text-court-gold bg-court-blue/15 shadow-[0_0_15px_rgba(245,215,110,0.15)] font-bold"
+                                        : "border-court-border/15 text-gray-400 bg-transparent hover:border-court-gold/30 hover:text-white"
+                                    }`}
+                                  >
+                                    <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                                      isSelected ? "border-court-gold" : "border-gray-500"
+                                    }`}>
+                                      {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-court-gold" />}
+                                    </span>
+                                    {option.text}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Submit button */}
+                          <div className="pt-4 border-t border-court-border/10 flex justify-between items-center">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setExhibitDStage(1);
+                                setSelectedConclusion("");
+                              }}
+                              className="text-[10px] font-mono text-gray-500 hover:text-court-gold transition-colors uppercase tracking-wider underline underline-offset-2"
+                            >
+                              Back to Findings
+                            </button>
+                            
+                            <button
+                              type="button"
+                              disabled={!selectedConclusion}
+                              onClick={() => {
+                                if (selectedConclusion === "NOT GUILTY") {
+                                  // Correct answer! This completes the stage
+                                  const res = submitAnswer("D", "NOT GUILTY");
+                                  if (res.success) {
+                                    setShowStatusModal("SUCCESS");
+                                    setTimeout(() => setShowStatusModal(null), 3000);
+                                  }
+                                } else {
+                                  // Wrong answer
+                                  const res = submitAnswer("D", "GUILTY");
+                                  if (!res.success) {
+                                    setShowStatusModal("ERROR");
+                                    setObjectionCount((prev) => prev + 1);
+                                    setTimeout(() => setShowStatusModal(null), 3000);
+                                  }
+                                }
+                              }}
+                              className="px-6 py-2.5 bg-court-panel border border-court-gold text-court-gold hover:bg-court-gold hover:text-court-bg disabled:border-court-border/10 disabled:text-gray-600 disabled:bg-transparent rounded font-serif font-bold text-xs tracking-wider uppercase transition-all flex items-center gap-2"
+                            >
+                              <Scale size={14} />
+                              <span>Submit Conclusion</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="text-gray-500 italic border-t border-court-border/10 pt-2">
-                      Verification Report: Accused's digital history indicates heavy logs on corporate development articles and zero hits on legal fantasy files.
-                    </div>
-                  </div>
-                  <p className="font-sans text-sm text-court-gold font-semibold">
-                    Question: Is the accused guilty?
-                  </p>
-                  <p className="font-sans text-xs text-gray-400">
-                    Input your verdict: YES / NO (or INNOCENT / GUILTY).
-                  </p>
+                  )}
                 </div>
               )}
 
@@ -534,38 +743,40 @@ export const GamePage = () => {
             </div>
 
             {/* C. Bottom: Input Pleadings Console */}
-            <form onSubmit={handleSubmit} className="border-t border-court-border/10 pt-5 mt-auto">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-grow">
-                  <input
-                    type="text"
-                    disabled={completedExhibits.includes(currentExhibitId)}
-                    value={inputVal}
-                    onChange={(e) => setInputVal(e.target.value)}
-                    placeholder={
-                      completedExhibits.includes(currentExhibitId)
-                        ? "Evidence Admitted and Locked"
-                        : "Enter pleading response..."
-                    }
-                    className="w-full bg-court-bg/80 border border-court-border/20 focus:border-court-gold rounded px-4 py-3 text-sm font-mono tracking-wider focus:outline-none uppercase text-white placeholder-gray-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-inner transition-colors"
-                  />
-                  {!completedExhibits.includes(currentExhibitId) && (
-                    <div className="absolute right-3 top-3.5 text-gray-500">
-                      <CornerDownLeft size={16} />
-                    </div>
-                  )}
-                </div>
+            {currentExhibitId !== "D" && (
+              <form onSubmit={handleSubmit} className="border-t border-court-border/10 pt-5 mt-auto">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="relative flex-grow">
+                    <input
+                      type="text"
+                      disabled={completedExhibits.includes(currentExhibitId)}
+                      value={inputVal}
+                      onChange={(e) => setInputVal(e.target.value)}
+                      placeholder={
+                        completedExhibits.includes(currentExhibitId)
+                          ? "Evidence Admitted and Locked"
+                          : "Enter pleading response..."
+                      }
+                      className="w-full bg-court-bg/80 border border-court-border/20 focus:border-court-gold rounded px-4 py-3 text-sm font-mono tracking-wider focus:outline-none uppercase text-white placeholder-gray-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-inner transition-colors"
+                    />
+                    {!completedExhibits.includes(currentExhibitId) && (
+                      <div className="absolute right-3 top-3.5 text-gray-500">
+                        <CornerDownLeft size={16} />
+                      </div>
+                    )}
+                  </div>
 
-                <button
-                  type="submit"
-                  disabled={!inputVal.trim() || completedExhibits.includes(currentExhibitId)}
-                  className="px-6 py-3 bg-court-panel border border-court-gold text-court-gold hover:bg-court-gold hover:text-court-bg disabled:border-court-border/10 disabled:text-gray-600 disabled:bg-transparent rounded font-serif font-bold text-sm tracking-wider uppercase transition-all flex items-center justify-center gap-2 shrink-0"
-                >
-                  <Scale size={16} />
-                  <span>Submit Evidence</span>
-                </button>
-              </div>
-            </form>
+                  <button
+                    type="submit"
+                    disabled={!inputVal.trim() || completedExhibits.includes(currentExhibitId)}
+                    className="px-6 py-3 bg-court-panel border border-court-gold text-court-gold hover:bg-court-gold hover:text-court-bg disabled:border-court-border/10 disabled:text-gray-600 disabled:bg-transparent rounded font-serif font-bold text-sm tracking-wider uppercase transition-all flex items-center justify-center gap-2 shrink-0"
+                  >
+                    <Scale size={16} />
+                    <span>Submit Evidence</span>
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
 

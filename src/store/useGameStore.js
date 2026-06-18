@@ -30,10 +30,10 @@ const EXHIBIT_DATA = {
   D: {
     id: "D",
     title: "Exhibit D — False Accusation Analysis",
-    correctAnswers: ["NO", "INNOCENT", "NOT GUILTY"],
-    openingMsg: "The Court now examines the accusation against the suspect. Counsel must determine whether reasonable doubt exists.",
-    hintMsg: "In criminal matters, certainty is not required. Proof is. Review the suspect's habits, their connection to Harry Potter, and fantasy recall.",
-    successMsg: "Reasonable doubt has been established. The accused is hereby discharged from suspicion.",
+    correctAnswers: ["NOT GUILTY"],
+    openingMsg: "The Court has reviewed the interrogation transcript and supporting verification report. Counsel is hereby directed to identify the findings which support the accused's claim of innocence. Select all findings supported by the evidence.",
+    hintMsg: "The Court directs Counsel to review the interrogation record. Select only findings directly corroborated by the text.",
+    successMsg: "The Court finds the selected findings consistent with the evidence presented. The accused demonstrates a documented preference for non-fiction material, exhibits limited familiarity with fantasy literature, and lacks any verified connection to the anonymous transmission. Reasonable doubt has therefore been established. The accused is discharged from suspicion.",
   },
   E: {
     id: "E",
