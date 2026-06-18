@@ -6,7 +6,7 @@ const EXHIBIT_DATA = {
   A: {
     id: "A",
     title: "Exhibit A — Item Classification",
-    correctAnswers: ["BOOK"],
+    correctAnswers: ["BOOK", "A BOOK"],
     openingMsg: "Exhibit A is hereby admitted. Counsel is required to establish the classification of the item before this Court.",
     hintMsg: "The Court reminds Counsel that evidence may take many forms, not all of them physical. It has pages, yet is not a calendar.",
     successMsg: "Classification confirmed. The Court records this as a Literary Artifact. Proceed to the next exhibit.",
