@@ -42,6 +42,7 @@ export const VerdictPage = () => {
     { text: "Case File No. 001 is concluded.", delay: 800 },
     { text: "Counsel has demonstrated satisfactory investigative ability.", delay: 800 },
     { text: "The Court acknowledges this as your first brief. Proceed with confidence.", delay: 1000 },
+    { text: `Congratulations on your first case, Counsel ${playerName || "Counsel"}!`, isHighlight: true, delay: 1200 },
     { text: "Court stands adjourned.", sound: "final_stamp", delay: 1500 }
   ];
 
@@ -316,9 +317,13 @@ export const VerdictPage = () => {
                     Certificate of Qualification
                   </span>
                   
-                  <h3 className="font-serif text-2xl font-semibold text-gold-gradient uppercase mb-6 tracking-wide">
+                  <h3 className="font-serif text-2xl font-semibold text-gold-gradient uppercase mb-2 tracking-wide">
                     Admitted to the Bar of Cases
                   </h3>
+                  
+                  <span className="font-mono text-[10px] text-court-cyan uppercase tracking-wider block mb-6">
+                    Congratulations on your first case, {playerName || "Counsel"}!
+                  </span>
 
                   <p className="font-sans text-xs text-gray-400 leading-relaxed mb-6 px-4">
                     This document certifies that the named Counsel has successfully resolved the encrypted case files of the Anonymous Transmission, recovered the literary work <span className="text-white">THE SON OF THE HOUSE</span>, and identified the transmission source.
