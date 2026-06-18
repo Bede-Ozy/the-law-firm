@@ -50,31 +50,59 @@ export const GamePage = () => {
   const dialogueSteps = [
     {
       speaker: "client",
-      text: `Counsel ${playerName || ""}, thank goodness you took my case. The High Court has intercepted a set of encrypted files, and they're accusing my close associate!`,
+      text: `Counsel ${playerName || ""}... thank goodness you've agreed to hear this matter.\n\nA close associate of mine has become entangled in an investigation, and I fear the authorities may be pursuing the wrong person.`,
     },
     {
       speaker: "lawyer",
-      text: "Calm down, Abigail. Take a deep breath. Tell me about these files. What exactly are we dealing with?",
+      text: "Slow down.\n\nStart from the beginning.\n\nWhat exactly is under investigation?",
     },
     {
       speaker: "client",
-      text: "They are calling it 'The Anonymous Transmission.' It seems to contain text from a literary work, but all identifiers—the type, the author, the title—have been scrambled.",
+      text: "An anonymous transmission.\n\nThat's the name they've given it.\n\nNo one seems certain where it came from, who created it, or what it even is.",
     },
     {
       speaker: "lawyer",
-      text: "And why is your associate under suspicion? Have they found any physical links?",
+      text: "And yet someone has already been accused?",
     },
     {
       speaker: "client",
-      text: "They found digital logs pointing to our household. But I know Jayken is holding the physical copy for safekeeping, and someone named Bede was involved in the transmission. We need to prove the accused's innocence!",
+      text: "Yes.\n\nApparently several fragments were recovered.\n\nThe investigators believe those fragments point toward a particular individual.\n\nBut the more I hear about the case, the less convinced I become.",
     },
     {
       speaker: "lawyer",
-      text: "I see. If I can reconstruct the facts—the classification of the item, the author, the title, the sender, and the custodian—I can establish reasonable doubt and discharge the suspect.",
+      text: "What do we know about the transmission itself?",
     },
     {
       speaker: "client",
-      text: "Yes, exactly! Please examine the files in the exhibits docket. The proceedings are about to begin.",
+      text: "Very little.\n\nThe records are incomplete.\n\nKey identifiers appear to be missing or intentionally obscured.\n\nThe classification remains uncertain.\n\nThe origin remains uncertain.\n\nEven the authorship appears disputed.",
+    },
+    {
+      speaker: "lawyer",
+      text: "So the Court is asking us to establish the facts before assigning responsibility.",
+    },
+    {
+      speaker: "client",
+      text: "Exactly.\n\nIf the facts are wrong, the accusation may be wrong as well.",
+    },
+    {
+      speaker: "lawyer",
+      text: "What materials have been provided?",
+    },
+    {
+      speaker: "client",
+      text: "A docket of exhibits.\n\nEach exhibit contains evidence recovered during the investigation.\n\nThe Court believes the truth can be reconstructed from those records.",
+    },
+    {
+      speaker: "lawyer",
+      text: "Then our task is clear.\n\nWe establish what the transmission is.\n\nWe determine who created it.\n\nWe identify its proper title.\n\nWe examine the accusation.\n\nAnd only then do we concern ourselves with questions of origin and custody.",
+    },
+    {
+      speaker: "client",
+      text: "That's why I came to you.\n\nThe proceedings are about to begin.\n\nThe exhibits are waiting.",
+    },
+    {
+      speaker: "lawyer",
+      text: "Very well.\n\nLet's see what the evidence is trying to hide.",
     }
   ];
 
@@ -157,8 +185,8 @@ export const GamePage = () => {
             {/* Section Title */}
             <div className="flex items-center justify-between border-b border-court-border/10 pb-4 mb-6">
               <div>
-                <h3 className="font-serif font-bold text-lg text-court-gold tracking-wider uppercase">Case Briefing</h3>
-                <span className="font-mono text-[9px] text-gray-500 uppercase tracking-widest">Pre-Proceedings Dialogue</span>
+                <h3 className="font-serif font-bold text-lg text-court-gold tracking-wider uppercase">Introductory Briefing</h3>
+                <span className="font-mono text-[9px] text-gray-500 uppercase tracking-widest">Client Consultation Room</span>
               </div>
               <div className="text-right font-mono text-xs text-court-cyan">
                 Docket 001-B
@@ -253,13 +281,27 @@ export const GamePage = () => {
                   className="w-full space-y-6 text-center"
                 >
                   {/* Objective box */}
-                  <div className="p-4 bg-court-bg/60 border border-court-border/20 rounded-md max-w-xl mx-auto text-left">
-                    <div className="text-[9px] font-mono text-court-gold uppercase tracking-widest font-bold mb-1">
-                      Case Objective & Directions
+                  <div className="p-5 bg-court-bg/60 border border-court-border/20 rounded-md max-w-xl mx-auto text-left space-y-4">
+                    <div className="text-[10px] font-mono text-court-gold uppercase tracking-widest font-bold border-b border-court-border/10 pb-1">
+                      Case Objectives
                     </div>
-                    <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                      Verify the facts to establish reasonable doubt. Counsel, you must audit the 6 exhibits. Analyze the classifications, biographical intercepts, title structures, suspect interrogations, logs, and custodial reports. Submit the pleadings to the Presiding Judge to resolve Case File No. 001.
-                    </p>
+                    <div className="text-xs text-gray-300 leading-relaxed font-sans space-y-3">
+                      <p>The Court has provided six exhibits.</p>
+                      <p>Your duty is to establish:</p>
+                      <ul className="list-disc pl-5 space-y-1 text-court-gold/90">
+                        <li>The classification of the anonymous transmission</li>
+                        <li>The identity of its creator</li>
+                        <li>The title of the work</li>
+                        <li>Whether the accused is guilty</li>
+                        <li>The origin of the transmission</li>
+                        <li>The current custodian of the evidence</li>
+                      </ul>
+                      <p className="border-t border-court-border/10 pt-3 text-[10px] font-mono uppercase tracking-wider text-gray-500">
+                        Remember:<br />
+                        Assumptions are not evidence.<br />
+                        Proceed only on facts established before the Court.
+                      </p>
+                    </div>
                   </div>
 
                   <button
