@@ -210,12 +210,12 @@ export const GamePage = () => {
                       : "border-transparent opacity-40 grayscale"
                   }`}
                 >
-                  <img src={clientAvatar} alt="Abigail" className="w-full h-full object-cover select-none" />
+                  <img src={clientAvatar} alt="Shola" className="w-full h-full object-cover select-none" />
                 </motion.div>
                 <span className={`text-[10px] font-mono mt-2 uppercase tracking-wider text-center ${
                   dialogueSteps[currentStep].speaker === "client" ? "text-court-gold font-bold" : "text-gray-500"
                 }`}>
-                  Abigail
+                  Shola
                 </span>
                 <span className="text-[8px] font-mono text-gray-500 tracking-widest uppercase">Client</span>
               </div>
@@ -228,7 +228,7 @@ export const GamePage = () => {
                 }`} />
 
                 <div className="text-[8px] font-mono text-court-gold/75 uppercase tracking-widest mb-2">
-                  {dialogueSteps[currentStep].speaker === "client" ? "Abigail" : `${playerName || "Counsel"}`}
+                  {dialogueSteps[currentStep].speaker === "client" ? "Shola" : `${playerName || "Counsel"}`}
                 </div>
                 <div className="text-xs font-sans leading-relaxed text-gray-200 min-h-[80px]">
                   <TypewriterText 
@@ -716,7 +716,7 @@ export const GamePage = () => {
                     <div>• <span className="text-court-gold">Location context:</span> Based in Abuja capital district.</div>
                     <div>• <span className="text-court-gold">Sports details:</span> Fanatical Chelsea FC supporter.</div>
                     <div>• <span className="text-court-gold">Association:</span> Co-worker in same school system.</div>
-                    <div>• <span className="text-court-gold">Mutual reference node:</span> Abigail.</div>
+                    <div>• <span className="text-court-gold">Mutual reference node:</span> Shola.</div>
                     <div>• <span className="text-court-gold">Observed behavior:</span> Deep interest in tracking books.</div>
                   </div>
                   <p className="font-sans text-xs text-gray-400">

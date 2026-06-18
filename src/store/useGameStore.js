@@ -40,7 +40,7 @@ const EXHIBIT_DATA = {
     title: "Exhibit E — Sender Identification",
     correctAnswers: ["BEDE"],
     openingMsg: "A matter of origin now comes before the Court. Counsel must identify the source of the transmission.",
-    hintMsg: "The Court notes patterns of proximity, association, and prior conduct. He supports Chelsea FC, works in Abuja, and knows Abigail.",
+    hintMsg: "The Court notes patterns of proximity, association, and prior conduct. He supports Chelsea FC, works in Abuja, and knows Shola.",
     successMsg: "Identity of the sender has been established. The Court records this name into the case file.",
   },
   F: {

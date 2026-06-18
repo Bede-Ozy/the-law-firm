@@ -5,7 +5,7 @@ import { Award, ChevronRight, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import { useGameStore } from "../store/useGameStore";
 import { soundManager } from "../utils/audioManager";
 import TypewriterText from "./TypewriterText";
-import bookCover from "../assets/book_cover.png";
+import bookCover from "../assets/The son of the house.jpg";
 
 export const VerdictPage = () => {
   const navigate = useNavigate();
