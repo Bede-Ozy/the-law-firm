@@ -50,7 +50,7 @@ export const GamePage = () => {
   const dialogueSteps = [
     {
       speaker: "client",
-      text: `Counsel ${playerName || ""}, thank goodness you've agreed to hear this matter. A close associate of mine has become entangled in an investigation, and I fear the authorities may be pursuing the wrong person. The case has been moving quickly, and from everything I've heard so far, the conclusions seem to be arriving much faster than the facts.`,
+      text: `Counsel ${playerName || ""}, thank goodness you've agreed to hear this matter.\n\nA close associate of mine has become entangled in an investigation, and I fear the authorities may be pursuing the wrong person.\n\nThe case has been moving quickly, and from everything I've heard so far, the conclusions seem to be arriving much faster than the facts.`,
     },
     {
       speaker: "lawyer",
@@ -58,7 +58,7 @@ export const GamePage = () => {
     },
     {
       speaker: "client",
-      text: "The authorities are calling it \"The Anonymous Transmission.\" That's all anyone seems willing to say with certainty. Fragments of information have been recovered, but the records are incomplete. Nobody appears able to agree on where the transmission originated, who created it, or even what it actually is.",
+      text: "The authorities are calling it \"The Anonymous Transmission.\" That's all anyone seems willing to say with certainty.\n\nFragments of information have been recovered, but the records are incomplete. Nobody appears able to agree on where the transmission originated, who created it, or even what it actually is.",
     },
     {
       speaker: "lawyer",
@@ -66,7 +66,7 @@ export const GamePage = () => {
     },
     {
       speaker: "client",
-      text: "That's what troubles me. Investigators believe the recovered fragments point toward a particular individual, and that assumption appears to have driven the entire case. But every time I hear a new detail, I become less convinced they truly understand what they're dealing with.",
+      text: "That's what troubles me. Investigators believe the recovered fragments point toward a particular individual, and that assumption appears to have driven the entire case.\n\nBut every time I hear a new detail, I become less convinced they truly understand what they're dealing with.",
     },
     {
       speaker: "lawyer",
@@ -74,19 +74,19 @@ export const GamePage = () => {
     },
     {
       speaker: "client",
-      text: "A docket of exhibits. Each exhibit contains information recovered during the investigation. The Court believes the truth can be reconstructed from those records, but no one has yet managed to piece everything together.",
+      text: "A docket of exhibits. Each exhibit contains information recovered during the investigation.\n\nThe Court believes the truth can be reconstructed from those records, but no one has yet managed to piece everything together.",
     },
     {
       speaker: "lawyer",
-      text: "Then our task is straightforward, even if it is not simple. Before responsibility can be assigned, the facts themselves must be established. We must determine the nature of the transmission, identify its creator, reconstruct its proper title, and examine the accusation against the suspect. Only after those matters have been resolved can questions of origin and custody be addressed with any confidence.",
+      text: "Then our task is straightforward, even if it is not simple. Before responsibility can be assigned, the facts themselves must be established.\n\nWe must determine the nature of the transmission, identify its creator, reconstruct its proper title, and examine the accusation against the suspect.\n\nOnly after those matters have been resolved can questions of origin and custody be addressed with any confidence.",
     },
     {
       speaker: "client",
-      text: "That's precisely why I came to you. If anyone can make sense of this case, it will be the person willing to follow the evidence wherever it leads rather than where assumptions would prefer it to go.",
+      text: "That's precisely why I came to you.\n\nIf anyone can make sense of this case, it will be the person willing to follow the evidence wherever it leads rather than where assumptions would prefer it to go.",
     },
     {
       speaker: "lawyer",
-      text: "Very well. Let us see whether the evidence supports the accusation—or whether the accusation has been standing on borrowed ground from the very beginning.",
+      text: "Very well.\n\nLet us see whether the evidence supports the accusation—or whether the accusation has been standing on borrowed ground from the very beginning.",
     },
     {
       speaker: "client",
