@@ -434,7 +434,8 @@ export const GamePage = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-court-bg/40 p-4 border border-court-border/10 rounded font-mono text-xs text-gray-300">
                     <div className="space-y-2">
                       <div><span className="text-court-gold">Nationality:</span> Nigerian</div>
-                      <div><span className="text-court-gold">Academic Origin:</span> Legal Background</div>
+                      <div><span className="text-court-gold">Academic Origin:</span> Professor of Law</div>
+                      <div><span className="text-court-gold">Institution:</span> Babcock University</div>
                     </div>
                     <div className="space-y-2">
                       <div><span className="text-court-gold">Thematic Focus:</span> Hidden Truths, Women, Family History</div>
