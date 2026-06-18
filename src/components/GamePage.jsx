@@ -50,59 +50,51 @@ export const GamePage = () => {
   const dialogueSteps = [
     {
       speaker: "client",
-      text: `Counsel ${playerName || ""}... thank goodness you've agreed to hear this matter. A close associate of mine has become entangled in an investigation, and I fear the authorities may be pursuing the wrong person.`,
+      text: `Counsel ${playerName || ""}, thank goodness you've agreed to hear this matter. A close associate of mine has become entangled in an investigation, and I fear the authorities may be pursuing the wrong person. The case has been moving quickly, and from everything I've heard so far, the conclusions seem to be arriving much faster than the facts.`,
     },
     {
       speaker: "lawyer",
-      text: "Slow down. Start from the beginning. What exactly is under investigation?",
+      text: "Take a moment and start from the beginning. What exactly is under investigation, and why has it attracted the Court's attention?",
     },
     {
       speaker: "client",
-      text: "An anonymous transmission. That's the name they've given it. No one seems certain where it came from, who created it, or what it even is.",
+      text: "The authorities are calling it \"The Anonymous Transmission.\" That's all anyone seems willing to say with certainty. Fragments of information have been recovered, but the records are incomplete. Nobody appears able to agree on where the transmission originated, who created it, or even what it actually is.",
     },
     {
       speaker: "lawyer",
-      text: "And yet someone has already been accused?",
+      text: "And despite all of that uncertainty, someone has already been accused?",
     },
     {
       speaker: "client",
-      text: "Yes. Apparently several fragments were recovered. The investigators believe those fragments point toward a particular individual. But the more I hear about the case, the less convinced I become.",
+      text: "That's what troubles me. Investigators believe the recovered fragments point toward a particular individual, and that assumption appears to have driven the entire case. But every time I hear a new detail, I become less convinced they truly understand what they're dealing with.",
     },
     {
       speaker: "lawyer",
-      text: "What do we know about the transmission itself?",
+      text: "Then the accusation may be built upon conclusions rather than evidence. What materials has the Court provided for examination?",
     },
     {
       speaker: "client",
-      text: "Very little. The records are incomplete. Key identifiers appear to be missing or intentionally obscured. The classification remains uncertain. The origin remains uncertain. Even the authorship appears disputed.",
+      text: "A docket of exhibits. Each exhibit contains information recovered during the investigation. The Court believes the truth can be reconstructed from those records, but no one has yet managed to piece everything together.",
     },
     {
       speaker: "lawyer",
-      text: "So the Court is asking us to establish the facts before assigning responsibility.",
+      text: "Then our task is straightforward, even if it is not simple. Before responsibility can be assigned, the facts themselves must be established. We must determine the nature of the transmission, identify its creator, reconstruct its proper title, and examine the accusation against the suspect. Only after those matters have been resolved can questions of origin and custody be addressed with any confidence.",
     },
     {
       speaker: "client",
-      text: "Exactly. If the facts are wrong, the accusation may be wrong as well.",
+      text: "That's precisely why I came to you. If anyone can make sense of this case, it will be the person willing to follow the evidence wherever it leads rather than where assumptions would prefer it to go.",
     },
     {
       speaker: "lawyer",
-      text: "What materials have been provided?",
+      text: "Very well. Let us see whether the evidence supports the accusation—or whether the accusation has been standing on borrowed ground from the very beginning.",
     },
     {
       speaker: "client",
-      text: "A docket of exhibits. Each exhibit contains evidence recovered during the investigation. The Court believes the truth can be reconstructed from those records.",
+      text: "The exhibits are ready, Counsel. Proceedings are about to begin.",
     },
     {
       speaker: "lawyer",
-      text: "Then our task is clear. We establish what the transmission is. We determine who created it. We identify its proper title. We examine the accusation. And only then do we concern ourselves with questions of origin and custody.",
-    },
-    {
-      speaker: "client",
-      text: "That's why I came to you. The proceedings are about to begin. The exhibits are waiting.",
-    },
-    {
-      speaker: "lawyer",
-      text: "Very well. Let's see what the evidence is trying to hide.",
+      text: "Then let's begin.",
     }
   ];
 
