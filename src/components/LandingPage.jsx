@@ -18,6 +18,22 @@ export const LandingPage = () => {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
   const [nameInput, setNameInput] = useState(playerName || "");
   const [genderInput, setGenderInput] = useState(playerGender || "");
+  const [infoConfirmed, setInfoConfirmed] = useState(
+    !!(playerName && playerName.trim().length >= 2 && playerGender)
+  );
+
+  const handleGenderSelect = (gender) => {
+    setGenderInput(gender);
+    if (nameInput.trim().length >= 2) {
+      setInfoConfirmed(true);
+    }
+  };
+
+  const handleNameKeyDown = (e) => {
+    if (e.key === "Enter" && nameInput.trim().length >= 2 && genderInput !== "") {
+      setInfoConfirmed(true);
+    }
+  };
 
   // Canvas Particle system (Floating Gold Dust)
   useEffect(() => {
@@ -227,70 +243,97 @@ export const LandingPage = () => {
           “Truth is rarely handed over. It must be established.”
         </motion.p>
 
-        {/* Counsel Profile Input Form */}
-        <div className="w-full max-w-sm mb-8 space-y-4 text-left bg-court-panel/30 border border-court-border/10 p-5 rounded-lg backdrop-blur-sm shadow-inner">
-          <div className="space-y-1.5">
-            <label className="flex items-center gap-1.5 font-mono text-[10px] tracking-wider text-court-gold/80 uppercase">
-              <User size={12} className="text-court-gold" />
-              <span>Counsel Name</span>
-            </label>
-            <input
-              type="text"
-              maxLength={22}
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              placeholder="Enter your name..."
-              className="w-full bg-court-bg/75 border border-court-border focus:border-court-gold rounded px-4 py-2.5 text-xs font-mono tracking-wider focus:outline-none text-white placeholder-gray-600 transition-all focus:ring-1 focus:ring-court-gold"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="font-mono text-[10px] tracking-wider text-court-gold/80 uppercase">
-              Gender Designation
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {["MALE", "FEMALE"].map((gender) => (
-                <button
-                  key={gender}
-                  type="button"
-                  onClick={() => setGenderInput(gender)}
-                  className={`py-2 px-1 border rounded text-[9px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
-                    genderInput === gender
-                      ? "border-court-gold text-court-gold bg-court-blue/15 shadow-[0_0_10px_rgba(245,215,110,0.15)] font-bold"
-                      : "border-court-border/20 text-gray-400 bg-transparent hover:border-court-gold/30 hover:text-white"
-                  }`}
-                >
-                  {gender.toLowerCase()}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Action Button - Animated appearance */}
-        <AnimatePresence>
-          {nameInput.trim().length >= 2 && genderInput !== "" && (
+        <AnimatePresence mode="wait">
+          {!infoConfirmed ? (
             <motion.div
-              initial={{ opacity: 0, y: 15, height: 0 }}
-              animate={{ opacity: 1, y: 0, height: "auto" }}
-              exit={{ opacity: 0, y: -15, height: 0 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              className="w-full flex justify-center"
+              key="input-form"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="w-full max-w-sm mb-8 space-y-4 text-left bg-court-panel/30 border border-court-border/10 p-5 rounded-lg backdrop-blur-sm shadow-inner"
             >
+              {/* Counsel Name Input */}
+              <div className="space-y-1.5">
+                <label className="flex items-center gap-1.5 font-mono text-[10px] tracking-wider text-court-gold/80 uppercase">
+                  <User size={12} className="text-court-gold" />
+                  <span>Counsel Name</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={22}
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  onKeyDown={handleNameKeyDown}
+                  placeholder="Enter your name..."
+                  className="w-full bg-court-bg/75 border border-court-border focus:border-court-gold rounded px-4 py-2.5 text-xs font-mono tracking-wider focus:outline-none text-white placeholder-gray-600 transition-all focus:ring-1 focus:ring-court-gold"
+                />
+              </div>
+
+              {/* Gender Designation */}
+              <div className="space-y-1.5">
+                <label className="font-mono text-[10px] tracking-wider text-court-gold/80 uppercase">
+                  Gender Designation
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {["MALE", "FEMALE"].map((gender) => (
+                    <button
+                      key={gender}
+                      type="button"
+                      onClick={() => handleGenderSelect(gender)}
+                      className={`py-2 px-1 border rounded text-[9px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
+                        genderInput === gender
+                          ? "border-court-gold text-court-gold bg-court-blue/15 shadow-[0_0_10px_rgba(245,215,110,0.15)] font-bold"
+                          : "border-court-border/20 text-gray-400 bg-transparent hover:border-court-gold/30 hover:text-white"
+                      }`}
+                    >
+                      {gender.toLowerCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="confirmed-view"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="w-full max-w-sm mb-8 flex flex-col items-center space-y-5 bg-court-panel/30 border border-court-border/10 p-6 rounded-lg backdrop-blur-sm shadow-inner"
+            >
+              <div className="text-center font-mono space-y-1">
+                <div className="text-[10px] tracking-wider text-gray-500 uppercase">Registered Counsel</div>
+                <div className="text-lg font-serif font-bold text-court-gold tracking-wide">
+                  {nameInput}
+                </div>
+                <div className="text-[9px] tracking-widest text-court-cyan/80 uppercase">
+                  Designation: {genderInput}
+                </div>
+              </div>
+
               <motion.button
-                whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(34, 111, 248, 0.4)" }}
+                whileHover={{ scale: 1.04, boxShadow: "0 0 25px rgba(34, 111, 248, 0.4)" }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleEnterChambers}
-                className="relative px-10 py-4 font-serif text-lg tracking-widest text-court-gold border border-court-gold bg-court-panel hover:bg-court-blue/15 hover:border-court-cyan transition-all rounded shadow-[0_4px_20px_rgba(0,0,0,0.3)] group overflow-hidden cursor-pointer"
+                className="w-full relative px-6 py-4 font-serif text-base tracking-widest text-court-gold border border-court-gold bg-court-panel hover:bg-court-blue/15 hover:border-court-cyan transition-all rounded shadow-[0_4px_20px_rgba(0,0,0,0.3)] group overflow-hidden cursor-pointer"
               >
                 {/* Sweeping scanline reflection overlay */}
                 <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:animate-[scanline_1.8s_ease-out_infinite]" />
                 
-                <span className="flex items-center gap-3">
+                <span className="flex items-center justify-center gap-3">
                   <Scale size={18} className="text-court-gold group-hover:text-court-cyan transition-colors" />
                   ENTER CHAMBERS
                 </span>
               </motion.button>
+
+              <button
+                type="button"
+                onClick={() => setInfoConfirmed(false)}
+                className="text-[10px] font-mono tracking-wider text-gray-500 hover:text-court-gold/80 transition-colors underline underline-offset-4 cursor-pointer"
+              >
+                Change Counsel Details
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
