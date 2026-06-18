@@ -50,15 +50,15 @@ export const GamePage = () => {
   const dialogueSteps = [
     {
       speaker: "client",
-      text: `Counsel ${playerName || ""}... thank goodness you've agreed to hear this matter.\n\nA close associate of mine has become entangled in an investigation, and I fear the authorities may be pursuing the wrong person.`,
+      text: `Counsel ${playerName || ""}... thank goodness you've agreed to hear this matter. A close associate of mine has become entangled in an investigation, and I fear the authorities may be pursuing the wrong person.`,
     },
     {
       speaker: "lawyer",
-      text: "Slow down.\n\nStart from the beginning.\n\nWhat exactly is under investigation?",
+      text: "Slow down. Start from the beginning. What exactly is under investigation?",
     },
     {
       speaker: "client",
-      text: "An anonymous transmission.\n\nThat's the name they've given it.\n\nNo one seems certain where it came from, who created it, or what it even is.",
+      text: "An anonymous transmission. That's the name they've given it. No one seems certain where it came from, who created it, or what it even is.",
     },
     {
       speaker: "lawyer",
@@ -66,7 +66,7 @@ export const GamePage = () => {
     },
     {
       speaker: "client",
-      text: "Yes.\n\nApparently several fragments were recovered.\n\nThe investigators believe those fragments point toward a particular individual.\n\nBut the more I hear about the case, the less convinced I become.",
+      text: "Yes. Apparently several fragments were recovered. The investigators believe those fragments point toward a particular individual. But the more I hear about the case, the less convinced I become.",
     },
     {
       speaker: "lawyer",
@@ -74,7 +74,7 @@ export const GamePage = () => {
     },
     {
       speaker: "client",
-      text: "Very little.\n\nThe records are incomplete.\n\nKey identifiers appear to be missing or intentionally obscured.\n\nThe classification remains uncertain.\n\nThe origin remains uncertain.\n\nEven the authorship appears disputed.",
+      text: "Very little. The records are incomplete. Key identifiers appear to be missing or intentionally obscured. The classification remains uncertain. The origin remains uncertain. Even the authorship appears disputed.",
     },
     {
       speaker: "lawyer",
@@ -82,7 +82,7 @@ export const GamePage = () => {
     },
     {
       speaker: "client",
-      text: "Exactly.\n\nIf the facts are wrong, the accusation may be wrong as well.",
+      text: "Exactly. If the facts are wrong, the accusation may be wrong as well.",
     },
     {
       speaker: "lawyer",
@@ -90,19 +90,19 @@ export const GamePage = () => {
     },
     {
       speaker: "client",
-      text: "A docket of exhibits.\n\nEach exhibit contains evidence recovered during the investigation.\n\nThe Court believes the truth can be reconstructed from those records.",
+      text: "A docket of exhibits. Each exhibit contains evidence recovered during the investigation. The Court believes the truth can be reconstructed from those records.",
     },
     {
       speaker: "lawyer",
-      text: "Then our task is clear.\n\nWe establish what the transmission is.\n\nWe determine who created it.\n\nWe identify its proper title.\n\nWe examine the accusation.\n\nAnd only then do we concern ourselves with questions of origin and custody.",
+      text: "Then our task is clear. We establish what the transmission is. We determine who created it. We identify its proper title. We examine the accusation. And only then do we concern ourselves with questions of origin and custody.",
     },
     {
       speaker: "client",
-      text: "That's why I came to you.\n\nThe proceedings are about to begin.\n\nThe exhibits are waiting.",
+      text: "That's why I came to you. The proceedings are about to begin. The exhibits are waiting.",
     },
     {
       speaker: "lawyer",
-      text: "Very well.\n\nLet's see what the evidence is trying to hide.",
+      text: "Very well. Let's see what the evidence is trying to hide.",
     }
   ];
 
