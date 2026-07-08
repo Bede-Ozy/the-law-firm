@@ -3,43 +3,35 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Folder, FolderLock, Shield, ArrowLeft } from "lucide-react";
 import { soundManager } from "../utils/audioManager";
-import { useGameStore } from "../store/useGameStore";
+import { useGameStore, CASE_DATA } from "../store/useGameStore";
 
 export const ChambersPage = () => {
   const navigate = useNavigate();
-  const { caseStatus, resetGame } = useGameStore();
+  const { caseProgress, selectCase, resetAllGames } = useGameStore();
 
-  const handleBeginCase = () => {
+  const handleBeginCase = (caseId) => {
     soundManager.playRustle();
-    navigate("/case/001");
+    selectCase(caseId);
+    navigate(`/case/${caseId}`);
   };
 
-  const cases = [
-    {
-      id: "001",
-      number: "No. 001",
-      title: "The Anonymous Transmission",
-      status: caseStatus, // 'OPEN' or 'CLOSED'
-      description: "An encrypted packet of pages has been intercepted at the partner's desk. You are assigned to audit the files and establish identity.",
-      unlocked: true,
-    },
-    {
-      id: "002",
-      number: "No. 002",
-      title: "The Gilded Ledger",
-      status: "LOCKED",
-      description: "A mysterious double-ledger containing transactions from an offshore account. Audit access pending senior partner approval.",
-      unlocked: false,
-    },
-    {
-      id: "003",
-      number: "No. 003",
-      title: "The Blood-Stained Ledger",
-      status: "LOCKED",
-      description: "Physical evidence logs recovered from a safehouse. Case file sealed by executive order.",
-      unlocked: false,
-    }
-  ];
+  const cases = Object.keys(CASE_DATA).map((caseId, index) => {
+    const caseObj = CASE_DATA[caseId];
+    const prevCaseId = Object.keys(CASE_DATA)[index - 1];
+    
+    // Unlocked if first case or previous case is solved (CLOSED)
+    const unlocked = index === 0 || (caseProgress && caseProgress[prevCaseId]?.caseStatus === "CLOSED");
+    const status = (caseProgress && caseProgress[caseId]?.caseStatus) || (index === 0 ? "OPEN" : "LOCKED");
+    
+    return {
+      id: caseId,
+      number: caseObj.number,
+      title: caseObj.title,
+      description: caseObj.description,
+      status: status,
+      unlocked: unlocked
+    };
+  });
 
   return (
     <div className="relative min-h-screen bg-court-bg text-white p-6 md:p-12 select-none scanlines flex flex-col justify-between">
@@ -80,7 +72,7 @@ export const ChambersPage = () => {
         </motion.div>
 
         {/* Case Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {cases.map((c, idx) => (
             <motion.div
               key={c.id}
@@ -92,7 +84,7 @@ export const ChambersPage = () => {
                   ? "border-court-gold/25 hover:border-court-gold/70 shadow-[0_4px_30px_rgba(245,215,110,0.05)] hover:shadow-[0_4px_35px_rgba(245,215,110,0.12)] cursor-pointer" 
                   : "border-court-border/10 opacity-60"
               }`}
-              onClick={c.unlocked ? handleBeginCase : undefined}
+              onClick={c.unlocked ? () => handleBeginCase(c.id) : undefined}
             >
               {/* Folder Ribbon Seal for Active Unlocked Case */}
               {c.unlocked && c.status === "OPEN" && (
@@ -153,7 +145,7 @@ export const ChambersPage = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleBeginCase();
+                        handleBeginCase(c.id);
                       }}
                       className="w-full py-2.5 px-4 rounded font-serif text-sm tracking-wider font-bold text-court-gold border border-court-gold/50 bg-court-panel hover:bg-court-gold hover:text-court-bg transition-all text-center uppercase"
                     >
@@ -172,7 +164,7 @@ export const ChambersPage = () => {
         </div>
 
         {/* Option to clear case file progress */}
-        {caseStatus === "CLOSED" && (
+        {caseProgress && Object.keys(CASE_DATA).some(id => caseProgress[id]?.caseStatus === "CLOSED") && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -181,13 +173,13 @@ export const ChambersPage = () => {
           >
             <button
               onClick={() => {
-                if (window.confirm("Are you sure you want to wipe the docket and restart Case File No. 001?")) {
-                  resetGame();
+                if (window.confirm("Are you sure you want to wipe all case files and reset your progress?")) {
+                  resetAllGames();
                 }
               }}
               className="text-xs font-mono uppercase tracking-widest text-red-400/70 hover:text-red-400 border-b border-dashed border-red-400/30 hover:border-red-400 transition-all"
             >
-              Reset Case File 001
+              Reset All Case Files
             </button>
           </motion.div>
         )}

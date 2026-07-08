@@ -52,7 +52,7 @@ function AnimatedRoutes() {
           } 
         />
         <Route 
-          path="/case/001" 
+          path="/case/:caseId" 
           element={
             <PageWrapper>
               <GamePage />

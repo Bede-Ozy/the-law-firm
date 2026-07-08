@@ -2,16 +2,22 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Award, ChevronRight, RotateCcw, Volume2, VolumeX } from "lucide-react";
-import { useGameStore } from "../store/useGameStore";
+import { useGameStore, CASE_DATA } from "../store/useGameStore";
 import { soundManager } from "../utils/audioManager";
 import TypewriterText from "./TypewriterText";
 import bookCover from "../assets/The son of the house.jpg";
+import { toPng } from "html-to-image";
 
 export const VerdictPage = () => {
   const navigate = useNavigate();
   const canvasRef = useRef(null);
-  const { errorCount, resetGame, isMuted, toggleMute, playerName } = useGameStore();
+  const certificateRef = useRef(null); // Ref for downloading certificate
+  const { currentCaseId, errorCount, resetGame, isMuted, toggleMute, playerName } = useGameStore();
+  const scrollContainerRef = useRef(null);
   
+  const caseObj = CASE_DATA[currentCaseId || "001"];
+  const verdict = caseObj.verdict;
+
   const [lineIndex, setLineIndex] = useState(0);
   const [typedLines, setTypedLines] = useState([]);
   const [isStampTriggered, setIsStampTriggered] = useState(false);
@@ -20,30 +26,34 @@ export const VerdictPage = () => {
 
   const isPerfectRun = errorCount === 0;
 
-  // Cinematic script lines
+  // Auto-scroll the transcript container to the bottom as new characters are typed
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const observer = new MutationObserver(() => {
+      container.scrollTop = container.scrollHeight;
+    });
+
+    observer.observe(container, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+
+    container.scrollTop = container.scrollHeight;
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Cinematic script lines loaded dynamically from CASE_DATA
   const script = [
-    { text: "Counsel, step forward...", delay: 800 },
-    { text: "All exhibits have been examined. Testimonies reviewed. Evidence weighed.", delay: 800 },
-    { text: "The Court now delivers its final ruling.", delay: 800 },
-    { text: "The anonymous literary artifact is hereby identified as:", delay: 800 },
-    { text: "THE SON OF THE HOUSE", isHighlight: true, isBig: true, sound: "boom", delay: 1500 },
-    { text: "The origin of transmission has been established.", delay: 800 },
-    { text: "BEDE", isHighlight: true, sound: "success", delay: 1200 },
-    { text: "The Court hereby authorizes immediate retrieval of Exhibit A.", delay: 800 },
-    { text: "Custody lies with Officer Jeken.", delay: 1200 },
-    
-    // Conditional Easter Egg Line
+    ...verdict.script.slice(0, -1),
     ...(isPerfectRun ? [
       { text: "A rare outcome. Perfect submission record.", isHighlight: true, delay: 1000 },
       { text: "The Court extends its commendation. Not all cases begin this cleanly.", isHighlight: true, delay: 1200 }
     ] : []),
-
-    { text: "This case is hereby closed.", delay: 800 },
-    { text: "Case File No. 001 is concluded.", delay: 800 },
-    { text: "Counsel has demonstrated satisfactory investigative ability.", delay: 800 },
-    { text: "The Court acknowledges this as your first brief. Proceed with confidence.", delay: 1000 },
-    { text: `Congratulations on your first case, Counsel ${playerName || "Counsel"}!`, isHighlight: true, delay: 1200 },
-    { text: "Court stands adjourned.", sound: "final_stamp", delay: 1500 }
+    verdict.script[verdict.script.length - 1]
   ];
 
   // Advance typewriter lines sequentially
@@ -168,6 +178,30 @@ export const VerdictPage = () => {
     navigate("/chambers");
   };
 
+  const downloadCertificate = () => {
+    if (!certificateRef.current) return;
+    
+    soundManager.playSuccess();
+    
+    toPng(certificateRef.current, {
+      cacheBust: true,
+      backgroundColor: "#0B0F19",
+      style: {
+        transform: "scale(1)",
+        borderRadius: "8px"
+      }
+    })
+      .then((dataUrl) => {
+        const link = document.createElement("a");
+        link.download = `${playerName || "Counsel"}_Bar_Certificate_Case_${currentCaseId}.png`;
+        link.href = dataUrl;
+        link.click();
+      })
+      .catch((err) => {
+        console.error("Oops, something went wrong with the certificate export!", err);
+      });
+  };
+
   return (
     <div className={`relative min-h-screen bg-court-bg text-white p-4 md:p-8 select-none scanlines flex flex-col justify-between overflow-x-hidden ${
       shakeScreen ? "animate-[shake_0.4s_ease-in-out_infinite]" : ""
@@ -219,12 +253,12 @@ export const VerdictPage = () => {
                   <span className="font-mono text-[9px] text-gray-500 uppercase tracking-widest">Official Ruling Transcript</span>
                 </div>
                 <div className="text-right font-mono text-xs text-court-cyan">
-                  Docket 001-A
+                  Docket {caseObj.number}-A
                 </div>
               </div>
 
               {/* Typed list scroll */}
-              <div className="space-y-4 font-mono text-sm leading-relaxed max-h-[420px] overflow-y-auto pr-2">
+              <div ref={scrollContainerRef} className="space-y-4 font-mono text-sm leading-relaxed max-h-[420px] overflow-y-auto pr-2">
                 {typedLines.map((line, idx) => (
                   <div key={idx} className="pb-1.5 border-b border-court-border/5">
                     {line.isBig ? (
@@ -292,11 +326,43 @@ export const VerdictPage = () => {
                   whileHover={{ rotateY: 15, rotateX: 5, z: 50, shadowBlur: 30 }}
                   className="relative w-64 h-[380px] rounded-lg overflow-hidden shadow-[0_15px_45px_0_rgba(0,0,0,0.6)] border border-court-gold/30 bg-court-panel group cursor-grab active:cursor-grabbing preserve-3d"
                 >
-                  <img
-                    src={bookCover}
-                    alt="The Son of the House"
-                    className="w-full h-full object-cover select-none"
-                  />
+                  {currentCaseId === "001" ? (
+                    <img
+                      src={bookCover}
+                      alt="The Son of the House"
+                      className="w-full h-full object-cover select-none"
+                    />
+                  ) : (
+                    /* Premium Gold-Foil CSS leather book cover fallback */
+                    <div className="w-full h-full bg-gradient-to-br from-[#1c120c] via-[#2c1d14] to-[#120a06] p-6 flex flex-col justify-between items-center text-center relative border-4 border-double border-court-gold/30 shadow-inner">
+                      {/* Leather texture overlay */}
+                      <div className="absolute inset-0 bg-[radial-gradient(#ffffff03_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+                      
+                      {/* Top case folder label */}
+                      <div className="border border-court-gold/40 px-3 py-1 bg-court-bg/85 rounded text-[10px] font-mono text-court-gold tracking-widest uppercase">
+                        Docket No. {caseObj.number}
+                      </div>
+
+                      {/* Center Emblem */}
+                      <div className="my-auto flex flex-col items-center">
+                        <div className="w-16 h-16 rounded-full border border-court-gold bg-[#3a271d] flex items-center justify-center mb-4 text-court-gold shadow-[0_0_15px_rgba(245,215,110,0.2)]">
+                          <Award size={36} className="stroke-[1.2]" />
+                        </div>
+                        <h4 className="font-serif text-lg font-bold tracking-wider text-court-gold uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-1 leading-tight">
+                          {caseObj.title}
+                        </h4>
+                        <div className="w-12 h-px bg-court-gold/40 my-3" />
+                        <span className="font-mono text-[9px] text-court-cyan uppercase tracking-widest">
+                          CONFIDENTIAL BRIEF
+                        </span>
+                      </div>
+
+                      {/* Bottom Seal metadata */}
+                      <div className="text-[8px] font-mono text-court-gold/60 uppercase tracking-widest border-t border-court-gold/20 pt-2 w-full">
+                        HIGH COURT DOCKET RECORD
+                      </div>
+                    </div>
+                  )}
                   {/* Glowing hover overlay reflection */}
                   <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
                 </motion.div>
@@ -304,7 +370,7 @@ export const VerdictPage = () => {
 
               {/* Certificate Sheet (7 cols) */}
               <div className="md:col-span-7">
-                <div className="glass-panel-heavy rounded-lg p-6 md:p-8 border border-court-gold/40 relative text-center">
+                <div ref={certificateRef} className="glass-panel-heavy rounded-lg p-6 md:p-8 border border-court-gold/40 relative text-center bg-[#0B0F19]">
                   
                   {/* Decorative Gold Borders */}
                   <div className="absolute inset-2 border border-double border-court-gold/20 rounded pointer-events-none" />
@@ -318,15 +384,15 @@ export const VerdictPage = () => {
                   </span>
                   
                   <h3 className="font-serif text-2xl font-semibold text-gold-gradient uppercase mb-2 tracking-wide">
-                    Admitted to the Bar of Cases
+                    {verdict.certificateTitle}
                   </h3>
                   
                   <span className="font-mono text-[10px] text-court-cyan uppercase tracking-wider block mb-6">
-                    Congratulations on your first case, {playerName || "Counsel"}!
+                    Congratulations on Case File {caseObj.number}, {playerName || "Counsel"}!
                   </span>
 
                   <p className="font-sans text-xs text-gray-400 leading-relaxed mb-6 px-4">
-                    This document certifies that the named Counsel has successfully resolved the encrypted case files of the Anonymous Transmission, recovered the literary work <span className="text-white">THE SON OF THE HOUSE</span>, and identified the transmission source.
+                    {verdict.certificateDescription}
                   </p>
 
                   {/* Name field */}
@@ -339,14 +405,14 @@ export const VerdictPage = () => {
                   {/* Seals & Signatures */}
                   <div className="flex justify-between items-center px-6 text-[9px] font-mono text-gray-500 uppercase tracking-widest mb-6">
                     <div className="text-left">
-                      <div>L.J. BEDE</div>
+                      <div>{verdict.judgeName}</div>
                       <div className="border-t border-gray-600/40 mt-1 pt-1">Presiding Judge</div>
                     </div>
                     <div className="w-12 h-12 border border-court-gold/30 rounded-full flex items-center justify-center text-court-gold/40">
                       SEAL
                     </div>
                     <div className="text-right">
-                      <div>JEKEN COURT</div>
+                      <div>{verdict.archivistName}</div>
                       <div className="border-t border-gray-600/40 mt-1 pt-1">Court Archivist</div>
                     </div>
                   </div>
@@ -377,6 +443,14 @@ export const VerdictPage = () => {
               <RotateCcw size={14} />
               <span>Reset Case Brief</span>
             </button>
+
+            <button
+              onClick={downloadCertificate}
+              className="px-6 py-2.5 bg-emerald-600 text-white hover:bg-emerald-500 font-serif font-bold text-xs tracking-wider rounded uppercase transition-all flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(16,185,129,0.3)]"
+            >
+              <Award size={14} />
+              <span>Download Certificate</span>
+            </button>
             
             <button
               onClick={() => navigate("/chambers")}
@@ -388,7 +462,7 @@ export const VerdictPage = () => {
           </motion.div>
         )}
         <div className="text-[9px] font-mono tracking-widest text-gray-600 uppercase mt-2 sm:mt-0">
-          ESTABLISHED COURT RECORD • NO. 001-C
+          ESTABLISHED COURT RECORD • NO. {caseObj.number}-C
         </div>
       </div>
 

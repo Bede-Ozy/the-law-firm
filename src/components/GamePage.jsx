@@ -5,7 +5,7 @@ import {
   Scale, ShieldAlert, Award, FileText, CheckCircle2, Lock, 
   HelpCircle, Volume2, VolumeX, RefreshCw, ChevronRight, CornerDownLeft
 } from "lucide-react";
-import { useGameStore, EXHIBIT_DATA } from "../store/useGameStore";
+import { useGameStore, CASE_DATA } from "../store/useGameStore";
 import { soundManager } from "../utils/audioManager";
 import TypewriterText from "./TypewriterText";
 
@@ -17,6 +17,7 @@ import lawyerFemale from "../assets/lawyer_female.png";
 export const GamePage = () => {
   const navigate = useNavigate();
   const {
+    currentCaseId,
     currentExhibitId,
     completedExhibits,
     answers,
@@ -39,6 +40,9 @@ export const GamePage = () => {
     playerGender
   } = useGameStore();
 
+  const caseObj = CASE_DATA[currentCaseId || "001"];
+  const EXHIBIT_DATA = caseObj.exhibits;
+
   const [inputVal, setInputVal] = useState("");
   const [showStatusModal, setShowStatusModal] = useState(null); // 'SUCCESS' or 'ERROR'
   const [objectionCount, setObjectionCount] = useState(0);
@@ -48,58 +52,18 @@ export const GamePage = () => {
   const [selectedFindings, setSelectedFindings] = useState([]);
   const [selectedConclusion, setSelectedConclusion] = useState("");
 
+  // Sync intro state when case changes
+  useEffect(() => {
+    setShowIntro(true);
+    setCurrentStep(0);
+  }, [currentCaseId]);
+
   const lawyerAvatar = playerGender === "FEMALE" ? lawyerFemale : lawyerMale;
 
-  const dialogueSteps = [
-    {
-      speaker: "client",
-      text: `Counsel ${playerName || ""}, thank goodness you've agreed to hear this matter.\n\nA close associate of mine has become entangled in an investigation, and I fear the authorities may be pursuing the wrong person.\n\nThe case has been moving quickly, and from everything I've heard so far, the conclusions seem to be arriving much faster than the facts.`,
-    },
-    {
-      speaker: "lawyer",
-      text: "Take a moment and start from the beginning. What exactly is under investigation, and why has it attracted the Court's attention?",
-    },
-    {
-      speaker: "client",
-      text: "The authorities are calling it \"The Anonymous Transmission.\" That's all anyone seems willing to say with certainty.\n\nFragments of information have been recovered, but the records are incomplete. Nobody appears able to agree on where the transmission originated, who created it, or even what it actually is.",
-    },
-    {
-      speaker: "lawyer",
-      text: "And despite all of that uncertainty, someone has already been accused?",
-    },
-    {
-      speaker: "client",
-      text: "That's what troubles me. Investigators believe the recovered fragments point toward a particular individual, and that assumption appears to have driven the entire case.\n\nBut every time I hear a new detail, I become less convinced they truly understand what they're dealing with.",
-    },
-    {
-      speaker: "lawyer",
-      text: "Then the accusation may be built upon conclusions rather than evidence. What materials has the Court provided for examination?",
-    },
-    {
-      speaker: "client",
-      text: "A docket of exhibits. Each exhibit contains information recovered during the investigation.\n\nThe Court believes the truth can be reconstructed from those records, but no one has yet managed to piece everything together.",
-    },
-    {
-      speaker: "lawyer",
-      text: "Then our task is straightforward, even if it is not simple. Before responsibility can be assigned, the facts themselves must be established.\n\nWe must determine the nature of the transmission, identify its creator, reconstruct its proper title, and examine the accusation against the suspect.\n\nOnly after those matters have been resolved can questions of origin and custody be addressed with any confidence.",
-    },
-    {
-      speaker: "client",
-      text: "That's precisely why I came to you.\n\nIf anyone can make sense of this case, it will be the person willing to follow the evidence wherever it leads rather than where assumptions would prefer it to go.",
-    },
-    {
-      speaker: "lawyer",
-      text: "Very well.\n\nLet us see whether the evidence supports the accusation—or whether the accusation has been standing on borrowed ground from the very beginning.",
-    },
-    {
-      speaker: "client",
-      text: "The exhibits are ready, Counsel. Proceedings are about to begin.",
-    },
-    {
-      speaker: "lawyer",
-      text: "Then let's begin.",
-    }
-  ];
+  const dialogueSteps = caseObj.briefing ? caseObj.briefing.map(step => ({
+    speaker: step.speaker,
+    text: step.text.replace("${playerName}", playerName || "Counsel"),
+  })) : [];
 
   // Sync state input field when switching tabs
   useEffect(() => {
@@ -167,7 +131,7 @@ export const GamePage = () => {
         <div className="flex flex-wrap items-center gap-6 text-sm">
           <div className="text-left md:text-right">
             <div className="text-[10px] font-mono tracking-widest text-gray-500 uppercase">Docket Directory</div>
-            <div className="font-serif font-bold text-court-gold tracking-wide">CASE FILE NO. 001: ANONYMOUS TRANSMISSION</div>
+            <div className="font-serif font-bold text-court-gold tracking-wide">CASE FILE {caseObj.number}: {caseObj.title}</div>
           </div>
         </div>
       </div>
@@ -191,7 +155,7 @@ export const GamePage = () => {
                 <span className="font-mono text-[9px] text-gray-500 uppercase tracking-widest">Client Consultation Room</span>
               </div>
               <div className="text-right font-mono text-xs text-court-cyan">
-                Docket 001-B
+                Docket {caseObj.number}-B
               </div>
             </div>
 
@@ -210,12 +174,12 @@ export const GamePage = () => {
                       : "border-transparent opacity-40 grayscale"
                   }`}
                 >
-                  <img src={clientAvatar} alt="Shola" className="w-full h-full object-cover select-none" />
+                  <img src={clientAvatar} alt={caseObj.clientName || "Shola"} className="w-full h-full object-cover select-none" />
                 </motion.div>
                 <span className={`text-[10px] font-mono mt-2 uppercase tracking-wider text-center ${
                   dialogueSteps[currentStep].speaker === "client" ? "text-court-gold font-bold" : "text-gray-500"
                 }`}>
-                  Shola
+                  {caseObj.clientName || "Shola"}
                 </span>
                 <span className="text-[8px] font-mono text-gray-500 tracking-widest uppercase">Client</span>
               </div>
@@ -228,7 +192,7 @@ export const GamePage = () => {
                 }`} />
 
                 <div className="text-[8px] font-mono text-court-gold/75 uppercase tracking-widest mb-2">
-                  {dialogueSteps[currentStep].speaker === "client" ? "Shola" : `${playerName || "Counsel"}`}
+                  {dialogueSteps[currentStep].speaker === "client" ? (caseObj.clientName || "Shola") : `${playerName || "Counsel"}`}
                 </div>
                 <div className="text-xs font-sans leading-relaxed text-gray-200 min-h-[80px]">
                   <TypewriterText 
@@ -410,340 +374,368 @@ export const GamePage = () => {
             </div>
 
             {/* Clue Details Per Exhibit */}
+            {/* Clue Details Per Exhibit */}
             <div className="flex-grow mb-6">
-              {currentExhibitId === "A" && (
-                <div className="space-y-4">
-                  <p className="font-sans text-sm text-gray-300 leading-relaxed">
-                    Review the encrypted records retrieved from the transmission buffer. Pleading counsel must classify the physical nature of the artifact:
-                  </p>
-                  <div className="p-5 bg-court-bg/50 border border-court-border/10 rounded font-serif italic text-court-gold/90 space-y-3 shadow-inner">
-                    <p className="flex items-start gap-2.5 text-base">
-                      <span className="font-mono text-xs text-court-gold/50 not-italic shrink-0 mt-1">Item 01:</span>
-                      “It contains many voices, yet speaks with only one.”
-                    </p>
-                    <p className="flex items-start gap-2.5 text-base">
-                      <span className="font-mono text-xs text-court-gold/50 not-italic shrink-0 mt-1">Item 02:</span>
-                      “It travels through time, yet never takes a step.”
-                    </p>
-                    <p className="flex items-start gap-2.5 text-base">
-                      <span className="font-mono text-xs text-court-gold/50 not-italic shrink-0 mt-1">Item 03:</span>
-                      “It may be opened, but it is not a door.”
-                    </p>
-                  </div>
-                  <p className="font-sans text-xs text-gray-400 italic">
-                    Hint: Enter the common English singular noun representing this classification (4 letters).
-                  </p>
-                </div>
-              )}
-
-              {currentExhibitId === "B" && (
-                <div className="space-y-4">
-                  <p className="font-sans text-sm text-gray-300 leading-relaxed">
-                    Examine this biographical intercept from the National Archives to establish the identity of the author:
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-court-bg/40 p-4 border border-court-border/10 rounded font-mono text-xs text-gray-300">
-                    <div className="space-y-2">
-                      <div><span className="text-court-gold">Nationality:</span> Nigerian</div>
-                      <div><span className="text-court-gold">Academic Origin:</span> Professor of Law</div>
-                      <div><span className="text-court-gold">Institution:</span> Babcock University</div>
-                    </div>
-                    <div className="space-y-2">
-                      <div><span className="text-court-gold">Thematic Focus:</span> Hidden Truths, Women, Family History</div>
-                      <div><span className="text-court-gold">Dossier Initials:</span> C.O.O.</div>
-                    </div>
-                  </div>
-                  <p className="font-sans text-xs text-gray-400 leading-relaxed">
-                    Provide the author's full name. Spelling must match official records exactly (e.g. FirstName LastName1-LastName2).
-                  </p>
-                </div>
-              )}
-
-              {currentExhibitId === "C" && (
-                <div className="space-y-4">
-                  <p className="font-sans text-sm text-gray-300 leading-relaxed">
-                    Deduce the literary work's exact title based on these architectural structural records:
-                  </p>
-                  <div className="p-4 bg-court-bg/60 border border-court-border/10 rounded flex flex-col items-center justify-center gap-4">
-                    <div className="flex gap-1.5 font-mono text-sm tracking-widest text-court-gold uppercase">
-                      <span className="px-2 py-1 bg-court-panel border border-court-border/20 rounded">[THE]</span>
-                      <span className="px-2 py-1 bg-court-panel/20 border border-dashed border-court-border/15 rounded text-gray-500">[_ _ _]</span>
-                      <span className="px-2 py-1 bg-court-panel border border-court-border/20 rounded">[OF]</span>
-                      <span className="px-2 py-1 bg-court-panel border border-court-border/20 rounded">[THE]</span>
-                      <span className="px-2 py-1 bg-court-panel/20 border border-dashed border-court-border/15 rounded text-gray-500">[_ _ _ _ _]</span>
-                    </div>
-                    <div className="w-full text-xs font-serif italic text-gray-300 space-y-1.5 max-w-md border-t border-court-border/10 pt-3">
-                      <div>• Total Title Structure: Five words.</div>
-                      <div>• Bounds: Starts with 'THE', finishes with 'HOUSE'.</div>
-                      <div>• Thematic note: The central subject is neither a king nor a father.</div>
-                    </div>
-                  </div>
-                  <p className="font-sans text-xs text-gray-400">
-                    Submit the full reconstructed title in English.
-                  </p>
-                </div>
-              )}
-
-              {currentExhibitId === "D" && (
-                <div className="space-y-5 flex-grow flex flex-col justify-between">
-                  {completedExhibits.includes("D") ? (
-                    // Solved State UI
+              {currentCaseId === "001" ? (
+                <>
+                  {currentExhibitId === "A" && (
                     <div className="space-y-4">
-                      <div className="p-4 bg-court-bg/50 border border-court-border/10 rounded font-mono text-xs text-gray-300 space-y-3 max-h-[140px] overflow-y-auto">
-                        <div>
-                          <span className="text-court-gold font-bold">COUNSEL:</span> Did you handle the book artifact at the secondary campus site?
-                        </div>
-                        <div>
-                          <span className="text-court-cyan font-bold">ACCUSED:</span> Absolutely not. I only read self-development logs. I struggle to recall basic plot structures of fantasy books, like Harry Potter. I have never accessed any literary fiction under docket custody.
-                        </div>
-                        <div className="text-gray-500 italic border-t border-court-border/10 pt-2">
-                          Verification Report: Accused's digital history indicates heavy logs on corporate development articles and zero hits on legal fantasy files.
-                        </div>
+                      <p className="font-sans text-sm text-gray-300 leading-relaxed">
+                        Review the encrypted records retrieved from the transmission buffer. Pleading counsel must classify the physical nature of the artifact:
+                      </p>
+                      <div className="p-5 bg-court-bg/50 border border-court-border/10 rounded font-serif italic text-court-gold/90 space-y-3 shadow-inner">
+                        <p className="flex items-start gap-2.5 text-base">
+                          <span className="font-mono text-xs text-court-gold/50 not-italic shrink-0 mt-1">Item 01:</span>
+                          “It contains many voices, yet speaks with only one.”
+                        </p>
+                        <p className="flex items-start gap-2.5 text-base">
+                          <span className="font-mono text-xs text-court-gold/50 not-italic shrink-0 mt-1">Item 02:</span>
+                          “It travels through time, yet never takes a step.”
+                        </p>
+                        <p className="flex items-start gap-2.5 text-base">
+                          <span className="font-mono text-xs text-court-gold/50 not-italic shrink-0 mt-1">Item 03:</span>
+                          “It may be opened, but it is not a door.”
+                        </p>
                       </div>
-
-                      <div className="p-5 border border-emerald-500/20 bg-emerald-950/10 rounded-lg space-y-3">
-                        <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-bold">
-                          Admitted Findings & Conclusion
-                        </div>
-                        <div className="text-xs text-gray-300 space-y-1">
-                          <div>• The accused demonstrates familiarity with self-development literature.</div>
-                          <div>• The accused struggles to recall fantasy narratives.</div>
-                          <div>• Independent records support the accused's stated reading habits.</div>
-                          <div>• No verified connection exists between the accused and the literary artifact.</div>
-                        </div>
-                        <div className="border-t border-court-border/10 pt-2 flex justify-between items-center text-xs font-mono">
-                          <span className="text-gray-400">LEGAL CONCLUSION:</span>
-                          <span className="text-emerald-400 font-bold uppercase">NOT GUILTY</span>
-                        </div>
-                      </div>
+                      <p className="font-sans text-xs text-gray-400 italic">
+                        Hint: Enter the common English singular noun representing this classification (4 letters).
+                      </p>
                     </div>
-                  ) : (
-                    // Interactive Argument Flow UI
-                    <div className="space-y-4 flex-grow flex flex-col justify-between">
-                      {exhibitDStage === 1 ? (
-                        /* Stage 1: Findings Checkboxes */
-                        <div className="space-y-4 flex-grow flex flex-col justify-between">
-                          <div className="space-y-3">
-                            <p className="font-sans text-xs text-gray-400 italic leading-relaxed border-l-2 border-court-gold/50 pl-3 py-0.5">
-                              Review the interrogation record below, then select all findings supported by the evidence.
-                            </p>
-                            
-                            {/* Interrogation Box */}
-                            <div className="p-3.5 bg-court-bg/50 border border-court-border/10 rounded font-mono text-[11px] text-gray-300 space-y-2.5 max-h-[115px] overflow-y-auto">
-                              <div>
-                                <span className="text-court-gold font-bold">COUNSEL:</span> Did you handle the book artifact at the secondary campus site?
-                              </div>
-                              <div>
-                                <span className="text-court-cyan font-bold">ACCUSED:</span> Absolutely not. I only read self-development logs. I struggle to recall basic plot structures of fantasy books, like Harry Potter. I have never accessed any literary fiction under docket custody.
-                              </div>
-                              <div className="text-gray-500 italic border-t border-court-border/10 pt-1.5">
-                                Verification Report: Accused's digital history indicates heavy logs on corporate development articles and zero hits on legal fantasy files.
-                              </div>
+                  )}
+
+                  {currentExhibitId === "B" && (
+                    <div className="space-y-4">
+                      <p className="font-sans text-sm text-gray-300 leading-relaxed">
+                        Examine this biographical intercept from the National Archives to establish the identity of the author:
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-court-bg/40 p-4 border border-court-border/10 rounded font-mono text-xs text-gray-300">
+                        <div className="space-y-2">
+                          <div><span className="text-court-gold">Nationality:</span> Nigerian</div>
+                          <div><span className="text-court-gold">Academic Origin:</span> Professor of Law</div>
+                          <div><span className="text-court-gold">Institution:</span> Babcock University</div>
+                        </div>
+                        <div className="space-y-2">
+                          <div><span className="text-court-gold">Thematic Focus:</span> Hidden Truths, Women, Family History</div>
+                          <div><span className="text-court-gold">Dossier Initials:</span> C.O.O.</div>
+                          <div><span className="text-court-gold">Region:</span> South-Eastern</div>
+                        </div>
+                      </div>
+                      <p className="font-sans text-xs text-gray-400 leading-relaxed">
+                        Provide the author's full name. Spelling must match official records exactly (e.g. FirstName LastName1-LastName2).
+                      </p>
+                    </div>
+                  )}
+
+                  {currentExhibitId === "C" && (
+                    <div className="space-y-4">
+                      <p className="font-sans text-sm text-gray-300 leading-relaxed">
+                        Deduce the literary work's exact title based on these architectural structural records:
+                      </p>
+                      <div className="p-4 bg-court-bg/60 border border-court-border/10 rounded flex flex-col items-center justify-center gap-4">
+                        <div className="flex gap-1.5 font-mono text-sm tracking-widest text-court-gold uppercase">
+                          <span className="px-2 py-1 bg-court-panel border border-court-border/20 rounded">[THE]</span>
+                          <span className="px-2 py-1 bg-court-panel/20 border border-dashed border-court-border/15 rounded text-gray-500">[_ _ _]</span>
+                          <span className="px-2 py-1 bg-court-panel border border-court-border/20 rounded">[OF]</span>
+                          <span className="px-2 py-1 bg-court-panel border border-court-border/20 rounded">[THE]</span>
+                          <span className="px-2 py-1 bg-court-panel/20 border border-dashed border-court-border/15 rounded text-gray-500">[_ _ _ _ _]</span>
+                        </div>
+                        <div className="w-full text-xs font-serif italic text-gray-300 space-y-1.5 max-w-md border-t border-court-border/10 pt-3">
+                          <div>• Total Title Structure: Five words.</div>
+                          <div>• Bounds: Starts with 'THE', finishes with 'HOUSE'.</div>
+                          <div>• Thematic note: The central subject is neither a king nor a father.</div>
+                        </div>
+                      </div>
+                      <p className="font-sans text-xs text-gray-400">
+                        Submit the full reconstructed title in English.
+                      </p>
+                    </div>
+                  )}
+
+                  {currentExhibitId === "D" && (
+                    <div className="space-y-5 flex-grow flex flex-col justify-between">
+                      {completedExhibits.includes("D") ? (
+                        // Solved State UI
+                        <div className="space-y-4">
+                          <div className="p-4 bg-court-bg/50 border border-court-border/10 rounded font-mono text-xs text-gray-300 space-y-3 max-h-[140px] overflow-y-auto">
+                            <div>
+                              <span className="text-court-gold font-bold">COUNSEL:</span> Did you handle the book artifact at the secondary campus site?
+                            </div>
+                            <div>
+                              <span className="text-court-cyan font-bold">ACCUSED:</span> Absolutely not. I only read self-development logs. I struggle to recall basic plot structures of fantasy books, like Harry Potter. I have never accessed any literary fiction under docket custody.
+                            </div>
+                            <div className="text-gray-500 italic border-t border-court-border/10 pt-2">
+                              Verification Report: Accused's digital history indicates heavy logs on corporate development articles and zero hits on legal fantasy files.
                             </div>
                           </div>
 
-                          {/* Checkbox Findings List */}
-                          <div className="space-y-2 flex-grow">
-                            <div className="text-[10px] font-mono text-court-gold uppercase tracking-wider">Findings Docket</div>
-                            <div className="grid grid-cols-1 gap-2 max-h-[220px] overflow-y-auto pr-1">
-                              {[
-                                { key: "A", text: "The accused demonstrates familiarity with self-development literature." },
-                                { key: "B", text: "The accused possesses extensive expertise in fantasy fiction." },
-                                { key: "C", text: "The accused struggles to recall fantasy narratives." },
-                                { key: "D", text: "Independent records support the accused's stated reading habits." },
-                                { key: "E", text: "Evidence confirms the accused accessed the anonymous transmission." },
-                                { key: "F", text: "No verified connection exists between the accused and the literary artifact." }
-                              ].map((item) => {
-                                const isSelected = selectedFindings.includes(item.key);
-                                return (
-                                  <label
-                                    key={item.key}
-                                    className={`flex items-start gap-3 p-2.5 border rounded cursor-pointer transition-all ${
-                                      isSelected
-                                        ? "border-court-gold bg-court-blue/10 text-white"
-                                        : "border-court-border/15 text-gray-300 hover:border-court-gold/30 hover:bg-court-blue/5"
-                                    }`}
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={isSelected}
-                                      onChange={() => {
-                                        if (isSelected) {
-                                          setSelectedFindings(prev => prev.filter(k => k !== item.key));
-                                        } else {
-                                          setSelectedFindings(prev => [...prev, item.key]);
-                                        }
-                                      }}
-                                      className="mt-1 accent-court-gold shrink-0 cursor-pointer"
-                                    />
-                                    <span className="text-[11px] leading-tight font-sans">
-                                      <strong className="font-mono text-court-gold mr-1.5">{item.key}.</strong>
-                                      {item.text}
-                                    </span>
-                                  </label>
-                                );
-                              })}
+                          <div className="p-5 border border-emerald-500/20 bg-emerald-950/10 rounded-lg space-y-3">
+                            <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-bold">
+                              Admitted Findings & Conclusion
                             </div>
-                          </div>
-
-                          {/* Submit findings button */}
-                          <div className="pt-3 border-t border-court-border/10 flex justify-end">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                // Correct findings: A, C, D, F
-                                const correct = ["A", "C", "D", "F"];
-                                const hasAllCorrect = selectedFindings.length === correct.length &&
-                                  selectedFindings.every(k => correct.includes(k));
-                                
-                                if (hasAllCorrect) {
-                                  soundManager.playSuccess();
-                                  setExhibitDStage(2);
-                                } else {
-                                  // Trigger error state in the store
-                                  const res = submitAnswer("D", "INVALID_FINDINGS");
-                                  if (!res.success) {
-                                    setShowStatusModal("ERROR");
-                                    setObjectionCount((prev) => prev + 1);
-                                    setTimeout(() => setShowStatusModal(null), 3000);
-                                  }
-                                }
-                              }}
-                              className="px-6 py-2.5 bg-court-panel border border-court-gold text-court-gold hover:bg-court-gold hover:text-court-bg rounded font-serif font-bold text-xs tracking-wider uppercase transition-all flex items-center gap-2"
-                            >
-                              <Scale size={14} />
-                              <span>Submit Findings</span>
-                            </button>
+                            <div className="text-xs text-gray-300 space-y-1">
+                              <div>• The accused demonstrates familiarity with self-development literature.</div>
+                              <div>• The accused struggles to recall fantasy narratives.</div>
+                              <div>• Independent records support the accused's stated reading habits.</div>
+                              <div>• No verified connection exists between the accused and the literary artifact.</div>
+                            </div>
+                            <div className="border-t border-court-border/10 pt-2 flex justify-between items-center text-xs font-mono">
+                              <span className="text-gray-400">LEGAL CONCLUSION:</span>
+                              <span className="text-emerald-400 font-bold uppercase">NOT GUILTY</span>
+                            </div>
                           </div>
                         </div>
                       ) : (
-                        /* Stage 2: Legal Conclusion Options */
-                        <div className="space-y-5 flex-grow flex flex-col justify-between py-2">
-                          <div className="space-y-4">
-                            <div className="p-4 bg-emerald-950/10 border border-emerald-500/20 text-emerald-300 rounded font-mono text-[11px] leading-relaxed">
-                              <strong>PROVISIONAL ADMITTANCE:</strong> The selected findings have been provisionally admitted into record. Counsel may now address the Court.
-                            </div>
+                        // Interactive Argument Flow UI
+                        <div className="space-y-4 flex-grow flex flex-col justify-between">
+                          {exhibitDStage === 1 ? (
+                            /* Stage 1: Findings Checkboxes */
+                            <div className="space-y-4 flex-grow flex flex-col justify-between">
+                              <div className="space-y-3">
+                                <p className="font-sans text-xs text-gray-400 italic leading-relaxed border-l-2 border-court-gold/50 pl-3 py-0.5">
+                                  Review the interrogation record below, then select all findings supported by the evidence.
+                                </p>
+                                
+                                {/* Interrogation Box */}
+                                <div className="p-3.5 bg-court-bg/50 border border-court-border/10 rounded font-mono text-[11px] text-gray-300 space-y-2.5 max-h-[115px] overflow-y-auto">
+                                  <div>
+                                    <span className="text-court-gold font-bold">COUNSEL:</span> Did you handle the book artifact at the secondary campus site?
+                                  </div>
+                                  <div>
+                                    <span className="text-court-cyan font-bold">ACCUSED:</span> Absolutely not. I only read self-development logs. I struggle to recall basic plot structures of fantasy books, like Harry Potter. I have never accessed any literary fiction under docket custody.
+                                  </div>
+                                  <div className="text-gray-500 italic border-t border-court-border/10 pt-1.5">
+                                    Verification Report: Accused's digital history indicates heavy logs on corporate development articles and zero hits on legal fantasy files.
+                                  </div>
+                                </div>
+                              </div>
 
-                            <div className="space-y-2">
-                              <span className="text-[10px] font-mono text-court-gold uppercase tracking-wider">Legal Question</span>
-                              <div className="text-xs text-gray-200 font-sans font-semibold">
-                                Based upon the admitted findings, what is the appropriate conclusion?
+                              {/* Checkbox Findings List */}
+                              <div className="space-y-2 flex-grow">
+                                <div className="text-[10px] font-mono text-court-gold uppercase tracking-wider">Findings Docket</div>
+                                <div className="grid grid-cols-1 gap-2 max-h-[220px] overflow-y-auto pr-1">
+                                  {[
+                                    { key: "A", text: "The accused demonstrates familiarity with self-development literature." },
+                                    { key: "B", text: "The accused possesses extensive expertise in fantasy fiction." },
+                                    { key: "C", text: "The accused struggles to recall fantasy narratives." },
+                                    { key: "D", text: "Independent records support the accused's stated reading habits." },
+                                    { key: "E", text: "Evidence confirms the accused accessed the anonymous transmission." },
+                                    { key: "F", text: "No verified connection exists between the accused and the literary artifact." }
+                                  ].map((item) => {
+                                    const isSelected = selectedFindings.includes(item.key);
+                                    return (
+                                      <label
+                                        key={item.key}
+                                        className={`flex items-start gap-3 p-2.5 border rounded cursor-pointer transition-all ${
+                                          isSelected
+                                            ? "border-court-gold bg-court-blue/10 text-white"
+                                            : "border-court-border/15 text-gray-300 hover:border-court-gold/30 hover:bg-court-blue/5"
+                                        }`}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          checked={isSelected}
+                                          onChange={() => {
+                                            if (isSelected) {
+                                              setSelectedFindings(prev => prev.filter(k => k !== item.key));
+                                            } else {
+                                              setSelectedFindings(prev => [...prev, item.key]);
+                                            }
+                                          }}
+                                          className="mt-1 accent-court-gold shrink-0 cursor-pointer"
+                                        />
+                                        <span className="text-[11px] leading-tight font-sans">
+                                          <strong className="font-mono text-court-gold mr-1.5">{item.key}.</strong>
+                                          {item.text}
+                                        </span>
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
+                              {/* Submit findings button */}
+                              <div className="pt-3 border-t border-court-border/10 flex justify-end">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    // Correct findings: A, C, D, F
+                                    const correct = ["A", "C", "D", "F"];
+                                    const hasAllCorrect = selectedFindings.length === correct.length &&
+                                      selectedFindings.every(k => correct.includes(k));
+                                    
+                                    if (hasAllCorrect) {
+                                      soundManager.playSuccess();
+                                      setExhibitDStage(2);
+                                    } else {
+                                      // Trigger error state in the store
+                                      const res = submitAnswer("D", "INVALID_FINDINGS");
+                                      if (!res.success) {
+                                        setShowStatusModal("ERROR");
+                                        setObjectionCount((prev) => prev + 1);
+                                        setTimeout(() => setShowStatusModal(null), 3000);
+                                      }
+                                    }
+                                  }}
+                                  className="px-6 py-2.5 bg-court-panel border border-court-gold text-court-gold hover:bg-court-gold hover:text-court-bg rounded font-serif font-bold text-xs tracking-wider uppercase transition-all flex items-center gap-2"
+                                >
+                                  <Scale size={14} />
+                                  <span>Submit Findings</span>
+                                </button>
                               </div>
                             </div>
+                          ) : (
+                            /* Stage 2: Legal Conclusion Options */
+                            <div className="space-y-5 flex-grow flex flex-col justify-between py-2">
+                              <div className="space-y-4">
+                                <div className="p-4 bg-emerald-950/10 border border-emerald-500/20 text-emerald-300 rounded font-mono text-[11px] leading-relaxed">
+                                  <strong>PROVISIONAL ADMITTANCE:</strong> The selected findings have been provisionally admitted into record. Counsel may now address the Court.
+                                </div>
 
-                            {/* Radio Options Grid */}
-                            <div className="grid grid-cols-2 gap-3 pt-2">
-                              {[
-                                { key: "GUILTY", text: "Guilty" },
-                                { key: "NOT GUILTY", text: "Not Guilty" }
-                              ].map((option) => {
-                                const isSelected = selectedConclusion === option.key;
-                                return (
-                                  <button
-                                    key={option.key}
-                                    type="button"
-                                    onClick={() => setSelectedConclusion(option.key)}
-                                    className={`p-4 border rounded font-serif text-sm tracking-wider uppercase transition-all text-center flex flex-col items-center justify-center gap-2 cursor-pointer ${
-                                      isSelected
-                                        ? "border-court-gold text-court-gold bg-court-blue/15 shadow-[0_0_15px_rgba(245,215,110,0.15)] font-bold"
-                                        : "border-court-border/15 text-gray-400 bg-transparent hover:border-court-gold/30 hover:text-white"
-                                    }`}
-                                  >
-                                    <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
-                                      isSelected ? "border-court-gold" : "border-gray-500"
-                                    }`}>
-                                      {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-court-gold" />}
-                                    </span>
-                                    {option.text}
-                                  </button>
-                                );
-                              })}
+                                <div className="space-y-2">
+                                  <span className="text-[10px] font-mono text-court-gold uppercase tracking-wider">Legal Question</span>
+                                  <div className="text-xs text-gray-200 font-sans font-semibold">
+                                    Based upon the admitted findings, what is the appropriate conclusion?
+                                  </div>
+                                </div>
+
+                                {/* Radio Options Grid */}
+                                <div className="grid grid-cols-2 gap-3 pt-2">
+                                  {[
+                                    { key: "GUILTY", text: "Guilty" },
+                                    { key: "NOT GUILTY", text: "Not Guilty" }
+                                  ].map((option) => {
+                                    const isSelected = selectedConclusion === option.key;
+                                    return (
+                                      <button
+                                        key={option.key}
+                                        type="button"
+                                        onClick={() => setSelectedConclusion(option.key)}
+                                        className={`p-4 border rounded font-serif text-sm tracking-wider uppercase transition-all text-center flex flex-col items-center justify-center gap-2 cursor-pointer ${
+                                          isSelected
+                                            ? "border-court-gold text-court-gold bg-court-blue/15 shadow-[0_0_15px_rgba(245,215,110,0.15)] font-bold"
+                                            : "border-court-border/15 text-gray-400 bg-transparent hover:border-court-gold/30 hover:text-white"
+                                        }`}
+                                      >
+                                        <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                                          isSelected ? "border-court-gold" : "border-gray-500"
+                                        }`}>
+                                          {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-court-gold" />}
+                                        </span>
+                                        {option.text}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
+                              {/* Submit button */}
+                              <div className="pt-4 border-t border-court-border/10 flex justify-between items-center">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setExhibitDStage(1);
+                                    setSelectedConclusion("");
+                                  }}
+                                  className="text-[10px] font-mono text-gray-500 hover:text-court-gold transition-colors uppercase tracking-wider underline underline-offset-2"
+                                >
+                                  Back to Findings
+                                </button>
+                                
+                                <button
+                                  type="button"
+                                  disabled={!selectedConclusion}
+                                  onClick={() => {
+                                    if (selectedConclusion === "NOT GUILTY") {
+                                      // Correct answer! This completes the stage
+                                      const res = submitAnswer("D", "NOT GUILTY");
+                                      if (res.success) {
+                                        setShowStatusModal("SUCCESS");
+                                        setTimeout(() => setShowStatusModal(null), 3000);
+                                      }
+                                    } else {
+                                      // Wrong answer
+                                      const res = submitAnswer("D", "GUILTY");
+                                      if (!res.success) {
+                                        setShowStatusModal("ERROR");
+                                        setObjectionCount((prev) => prev + 1);
+                                        setTimeout(() => setShowStatusModal(null), 3000);
+                                      }
+                                    }
+                                  }}
+                                  className="px-6 py-2.5 bg-court-panel border border-court-gold text-court-gold hover:bg-court-gold hover:text-court-bg disabled:border-court-border/10 disabled:text-gray-600 disabled:bg-transparent rounded font-serif font-bold text-xs tracking-wider uppercase transition-all flex items-center gap-2"
+                                >
+                                  <Scale size={14} />
+                                  <span>Submit Conclusion</span>
+                                </button>
+                              </div>
                             </div>
-                          </div>
-
-                          {/* Submit button */}
-                          <div className="pt-4 border-t border-court-border/10 flex justify-between items-center">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setExhibitDStage(1);
-                                setSelectedConclusion("");
-                              }}
-                              className="text-[10px] font-mono text-gray-500 hover:text-court-gold transition-colors uppercase tracking-wider underline underline-offset-2"
-                            >
-                              Back to Findings
-                            </button>
-                            
-                            <button
-                              type="button"
-                              disabled={!selectedConclusion}
-                              onClick={() => {
-                                if (selectedConclusion === "NOT GUILTY") {
-                                  // Correct answer! This completes the stage
-                                  const res = submitAnswer("D", "NOT GUILTY");
-                                  if (res.success) {
-                                    setShowStatusModal("SUCCESS");
-                                    setTimeout(() => setShowStatusModal(null), 3000);
-                                  }
-                                } else {
-                                  // Wrong answer
-                                  const res = submitAnswer("D", "GUILTY");
-                                  if (!res.success) {
-                                    setShowStatusModal("ERROR");
-                                    setObjectionCount((prev) => prev + 1);
-                                    setTimeout(() => setShowStatusModal(null), 3000);
-                                  }
-                                }
-                              }}
-                              className="px-6 py-2.5 bg-court-panel border border-court-gold text-court-gold hover:bg-court-gold hover:text-court-bg disabled:border-court-border/10 disabled:text-gray-600 disabled:bg-transparent rounded font-serif font-bold text-xs tracking-wider uppercase transition-all flex items-center gap-2"
-                            >
-                              <Scale size={14} />
-                              <span>Submit Conclusion</span>
-                            </button>
-                          </div>
+                          )}
                         </div>
                       )}
                     </div>
                   )}
-                </div>
-              )}
 
-              {currentExhibitId === "E" && (
-                <div className="space-y-4">
-                  <p className="font-sans text-sm text-gray-300 leading-relaxed">
-                    A network transmission link analysis was conducted on communications logs. Identify the sender:
-                  </p>
-                  <div className="p-4 bg-court-bg/40 border border-court-border/10 rounded font-mono text-xs text-gray-300 space-y-2">
-                    <div>• <span className="text-court-gold">Location context:</span> Based in Abuja capital district.</div>
-                    <div>• <span className="text-court-gold">Sports details:</span> Fanatical Chelsea FC supporter.</div>
-                    <div>• <span className="text-court-gold">Association:</span> Co-worker in same school system.</div>
-                    <div>• <span className="text-court-gold">Mutual reference node:</span> Shola.</div>
-                    <div>• <span className="text-court-gold">Observed behavior:</span> Deep interest in tracking books.</div>
-                  </div>
-                  <p className="font-sans text-xs text-gray-400">
-                    Input the sender's name (4 letters).
-                  </p>
-                </div>
-              )}
+                  {currentExhibitId === "E" && (
+                    <div className="space-y-4">
+                      <p className="font-sans text-sm text-gray-300 leading-relaxed">
+                        A network transmission link analysis was conducted on communications logs. Identify the sender:
+                      </p>
+                      <div className="p-4 bg-court-bg/40 border border-court-border/10 rounded font-mono text-xs text-gray-300 space-y-2">
+                        <div>• <span className="text-court-gold">Location context:</span> Based in Abuja capital district.</div>
+                        <div>• <span className="text-court-gold">Sports details:</span> Fanatical Chelsea FC supporter.</div>
+                        <div>• <span className="text-court-gold">Association:</span> Co-worker in same school system TBRA.</div>
+                        <div>• <span className="text-court-gold">Mutual Acquaintance:</span> Abigail.</div>
+                        <div>• <span className="text-court-gold">Observed behavior:</span> Has blue blood and is deeply linked with King Leo of Argentina (10).</div>
+                      </div>
+                      <p className="font-sans text-xs text-gray-400">
+                        Input the sender's name (4 letters).
+                      </p>
+                    </div>
+                  )}
 
-              {currentExhibitId === "F" && (
+                  {currentExhibitId === "F" && (
+                    <div className="space-y-4">
+                      <p className="font-sans text-sm text-gray-300 leading-relaxed">
+                        Locate where the physical book is being held in escrow. Determine the identity of the custodian:
+                      </p>
+                      <div className="p-4 bg-court-bg/50 border border-court-border/10 rounded font-serif italic text-court-gold/90 space-y-2">
+                        <div>• “The book is in safe custody.”</div>
+                        <div>• “The custodian lives in the same household as the Counsel {playerName || "Counsel"}.”</div>
+                        <div>• “The custodian is younger than the Counsel {playerName || "Counsel"}.”</div>
+                      </div>
+                      <p className="font-sans text-xs text-gray-400">
+                        Input the custodian's name (5 letters).
+                      </p>
+                    </div>
+                  )}
+                </>
+              ) : (
                 <div className="space-y-4">
-                  <p className="font-sans text-sm text-gray-300 leading-relaxed">
-                    Locate where the physical book is being held in escrow. Determine the identity of the custodian:
+                  <p className="font-sans text-sm text-gray-300 leading-relaxed font-semibold text-court-gold">
+                    {EXHIBIT_DATA[currentExhibitId].openingMsg}
                   </p>
-                  <div className="p-4 bg-court-bg/50 border border-court-border/10 rounded font-serif italic text-court-gold/90 space-y-2">
-                    <div>• “The book is in safe custody.”</div>
-                    <div>• “The custodian lives in the same household as the accused.”</div>
-                    <div>• “The custodian is younger than the accused.”</div>
+                  
+                  {EXHIBIT_DATA[currentExhibitId].clueLines && EXHIBIT_DATA[currentExhibitId].clueLines.length > 0 && (
+                    <div className="p-5 bg-court-bg/50 border border-court-border/10 rounded font-mono text-xs text-gray-300 space-y-3 shadow-inner">
+                      {EXHIBIT_DATA[currentExhibitId].clueLines.map((line, idx) => (
+                        <div key={idx} className="flex items-start gap-2.5 leading-relaxed">
+                          <span className="text-court-gold font-bold select-none shrink-0">•</span>
+                          <span>{line}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <div className="p-3 bg-court-panel/20 border border-dashed border-court-border/10 rounded text-xs text-gray-400">
+                    <span className="font-mono text-[9px] uppercase tracking-wider text-court-cyan/80 block mb-1">Judicial Hint:</span>
+                    {EXHIBIT_DATA[currentExhibitId].hintMsg}
                   </div>
-                  <p className="font-sans text-xs text-gray-400">
-                    Input the custodian's name (5 letters).
-                  </p>
                 </div>
               )}
             </div>
 
             {/* C. Bottom: Input Pleadings Console */}
-            {currentExhibitId !== "D" && (
+            {(currentCaseId !== "001" || currentExhibitId !== "D") && (
               <form onSubmit={handleSubmit} className="border-t border-court-border/10 pt-5 mt-auto">
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="relative flex-grow">
@@ -849,12 +841,7 @@ export const GamePage = () => {
                       <span className="font-mono text-court-gold/80 font-semibold uppercase mr-1">{key}:</span>
                       {isDone ? (
                         <span>
-                          {key === "A" && `Classification: ${answers.A}`}
-                          {key === "B" && `Author: ${answers.B}`}
-                          {key === "C" && `Title: ${answers.C}`}
-                          {key === "D" && `Accused: ${answers.D === "NO" || answers.D === "INNOCENT" || answers.D === "NOT GUILTY" ? "Innocent" : answers.D}`}
-                          {key === "E" && `Sender: ${answers.E}`}
-                          {key === "F" && `Custodian: ${answers.F}`}
+                          {data.ledgerLabel}: {answers[key]}
                         </span>
                       ) : (
                         <span className="text-gray-500 italic">Awaiting pleading...</span>
@@ -946,10 +933,10 @@ export const GamePage = () => {
           <div className="text-center">
             <button
               onClick={() => {
-                if (window.confirm("Are you sure you want to wipe the docket and restart Case File No. 001?")) {
+                if (window.confirm(`Are you sure you want to wipe the docket and restart Case File ${caseObj.number}?`)) {
                   resetGame();
                   setInputVal("");
-                  setShowIntro(true);
+                  setShowIntro(currentCaseId === "001");
                   setCurrentStep(0);
                 }
               }}
